@@ -2,20 +2,21 @@ package com.jin.android.indiestage.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -28,12 +29,13 @@ import com.jin.android.indiestage.util.contrastAgainst
 import com.jin.android.indiestage.util.rememberDominantColorState
 import com.jin.android.indiestage.util.verticalGradientScrim
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jin.android.indiestage.ui.theme.IndieStageTheme
 
 
 @ExperimentalPagerApi
 @Composable
 fun Home(
-       viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel()
 ) {
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
@@ -157,14 +159,19 @@ private fun PosterItem(
     imageUrl: String? = null,
     title: String? = "Title"
 ) {
+
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
-        modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        modifier
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         Box(
             Modifier
                 .weight(1f)
                 .align(Alignment.CenterHorizontally)
                 .aspectRatio(1f)
+                .clickable(onClick = { expanded = !expanded })
         ) {
             if (imageUrl != null) {
                 Image(
@@ -176,8 +183,50 @@ private fun PosterItem(
                         .clip(MaterialTheme.shapes.medium),
                 )
             }
-        }
 
+            if (expanded) {
+                Surface(
+                    color = colorResource(id = R.color.shadow50),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                    ) {
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                        ) {
+                            Text("전시 입장")
+                        }
+
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                        ) {
+                            Text("둘러 보기")
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewPosterItem() {
+    IndieStageTheme {
+        PosterItem(
+            imageUrl = "https://ia902607.us.archive.org/32/items/mbid-76df3287-6cda-33eb-8e9a-044b5e15ffdd/mbid-76df3287-6cda-33eb-8e9a-044b5e15ffdd-829521842_thumb500.jpg"
+        )
     }
 }
 
