@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">IndieBooks</string>
+    <string name="app_name" translatable="false">Indie Stage</string>
+    <string name="connection_error_title">Connection Error</string>
+    <string name="connection_error_message">Check your Network please</string>
+    <string name="retry_label">retry</string>
+    <string name="setting">Setting</string>
 </resources>

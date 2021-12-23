@@ -1,4 +1,4 @@
-package com.jin.android.indiebooks
+package com.jin.android.indiestage
 
 import org.junit.Test
 

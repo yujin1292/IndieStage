@@ -1,4 +1,4 @@
-package com.jin.android.indiebooks.ui.theme
+package com.jin.android.indiestage.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_error_title">연결 실패</string>
+    <string name="connection_error_message">연결 상태를 확인 해 주세요.</string>
+    <string name="retry_label">재시도</string>
+    <string name="setting">설정</string>
+</resources>
