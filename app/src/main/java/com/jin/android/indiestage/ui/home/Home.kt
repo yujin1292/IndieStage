@@ -16,7 +16,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -29,20 +28,20 @@ import com.jin.android.indiestage.util.contrastAgainst
 import com.jin.android.indiestage.util.rememberDominantColorState
 import com.jin.android.indiestage.util.verticalGradientScrim
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jin.android.indiestage.ui.theme.IndieStageTheme
+import com.jin.android.indiestage.data.Poster
 
 
 @ExperimentalPagerApi
 @Composable
 fun Home(
-    navigateToStage: (String) -> Unit,
+    navigateToStage: (String) -> Unit, //TODO navigateToTicketBox 으로 변경
     viewModel: HomeViewModel = viewModel()
 ) {
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
             navigateToStage = navigateToStage,
             modifier = Modifier.fillMaxSize(),
-            posters = viewModel.imageList
+            posters = viewModel.tempData
         )
     }
 }
@@ -52,7 +51,7 @@ fun Home(
 fun HomeContent(
     navigateToStage: (String) -> Unit,
     modifier: Modifier = Modifier,
-    posters: List<String>,
+    posters: List<Poster>,
 ) {
     Column {
         val surfaceColor = MaterialTheme.colors.surface
@@ -63,7 +62,7 @@ fun HomeContent(
 
         DynamicThemePrimaryColorsFromImage(dominantColorState) {
             val pagerState = rememberPagerState()
-            val selectedImageUrl = posters.getOrNull(pagerState.currentPage)
+            val selectedImageUrl = posters.getOrNull(pagerState.currentPage)?.imageUrl
 
             // When the selected image url changes, call updateColorsFromImageUrl() or reset()
             LaunchedEffect(selectedImageUrl) {
@@ -108,7 +107,7 @@ fun HomeContent(
                     ) { page ->
                         PosterItem(
                             onClick = navigateToStage,
-                            imageUrl = posters[page],
+                            item = posters[page],
                             modifier = Modifier
                                 .padding(4.dp)
                                 .fillMaxHeight()
@@ -160,9 +159,7 @@ fun HomeAppBar(
 private fun PosterItem(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    imageUrl: String? = null,
-    artistUri: String = "artist",
-    title: String? = "Title"
+    item:Poster
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -178,10 +175,10 @@ private fun PosterItem(
                 .aspectRatio(1f)
                 .clickable(onClick = { expanded = !expanded })
         ) {
-            if (imageUrl != null) {
+            if (item.imageUrl != null) {
                 Image(
-                    painter = rememberImagePainter(data = imageUrl),
-                    contentDescription = title,
+                    painter = rememberImagePainter(data = item.imageUrl),
+                    contentDescription = item.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
@@ -196,28 +193,17 @@ private fun PosterItem(
                         .fillMaxSize()
                         .align(Alignment.Center)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                    ) {
+                    Row( verticalAlignment = Alignment.CenterVertically){
                         Button(
-                            onClick = {onClick(artistUri)},
+                            onClick = {onClick(item.stageUri)},
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .padding(10.dp)
+                                .fillMaxWidth()
                         ) {
                             Text("전시 입장")
                         }
-
-                        Button(
-                            onClick = {onClick(artistUri)},
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp)
-                        ) {
-                            Text("둘러 보기")
-                        }
                     }
+
                 }
 
             }
