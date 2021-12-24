@@ -5,13 +5,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.jin.android.indiestage.ui.artwork.ArtWork
 import com.jin.android.indiestage.ui.home.Home
 import com.jin.android.indiestage.ui.stage.Stage
-import com.jin.android.indiestage.ui.stage.StageViewModel
 
 @ExperimentalPagerApi
 @Composable
@@ -29,11 +28,27 @@ fun IndieStageApp(appState: IndieStageAppState = rememberIndieStageAppState()) {
                     }
                 )
             }
-            composable(Screen.Stage.route) {
-                Stage( onBackPress = appState::navigateBack)
+            composable(Screen.Stage.route) { backStageEntry ->
+                backStageEntry.arguments?.getString("stageUri")?.let {
+                    Stage(
+                        onBackPress = appState::navigateBack,
+                        stageUri = it,
+                        navigateToArtWork = { stageUri, artWorkUri, mode, page ->
+                            appState.navigateToArtWork(
+                                stageUri = stageUri,
+                                artWorkUri = artWorkUri,
+                                mode = mode,
+                                page = page,
+                                from = backStageEntry
+                            )
+                        }
+                    )
+                }
+            }
+            composable(Screen.ArtWork.route){
+                ArtWork()
             }
         }
-        //Home()
     } else {
         OfflineDialog { appState.refreshOnline() }
     }

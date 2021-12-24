@@ -17,12 +17,12 @@ import androidx.navigation.compose.rememberNavController
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object TicketBox : Screen("ticketBox")
-    object Stage : Screen("stage/{artistUri}") {
-        fun createRoute(artistUri: String) = "stage/$artistUri"
+    object Stage : Screen("stage/{stageUri}") {
+        fun createRoute(stageUri: String) = "stage/$stageUri"
     }
-    object ArtDetail : Screen("stage/{artistUri}/{artUri}/{mode}/{page}") {
-        fun createRoute(artistUri: String, artUri: String, mode:String, page: String) =
-            "stage/$artistUri/$artUri/$mode/$page"
+    object ArtWork : Screen("stage/{stageUri}/{artWorkUri}/{mode}/{page}") {
+        fun createRoute(stageUri: String, artWorkUri: String, mode: String, page: Int) =
+            "stage/$stageUri/$artWorkUri/$mode/$page"
     }
 }
 
@@ -45,11 +45,38 @@ class IndieStageAppState(
         isOnline = checkIfOnline()
     }
 
-    fun navigateToStage(artistID: String, from: NavBackStackEntry) {
+    fun navigateToStage(stageUri: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
-            val encodedUri = Uri.encode(artistID)
+            val encodedUri = Uri.encode(stageUri)
             navController.navigate(Screen.Stage.createRoute(encodedUri))
+        }
+    }
+
+    fun navigateToTicketBox(){
+
+    }
+
+    fun navigateToArtWork(
+        stageUri: String,
+        artWorkUri: String,
+        mode: String,
+        page: Int,
+        from: NavBackStackEntry
+    ) {
+        if (from.lifecycleIsResumed()) {
+            val encodedArtistUri = Uri.encode(stageUri)
+            val encodedArtWorkUri = Uri.encode(artWorkUri)
+            val encodedModeUri = Uri.encode(mode)
+
+            navController.navigate(
+                Screen.ArtWork.createRoute(
+                    stageUri = encodedArtistUri,
+                    artWorkUri = encodedArtWorkUri,
+                    mode = encodedModeUri,
+                    page = page
+                )
+            )
         }
     }
 
