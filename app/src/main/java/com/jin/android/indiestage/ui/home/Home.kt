@@ -35,53 +35,22 @@ import com.jin.android.indiestage.ui.theme.IndieStageTheme
 @ExperimentalPagerApi
 @Composable
 fun Home(
+    navigateToStage: (String) -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
+            navigateToStage = navigateToStage,
             modifier = Modifier.fillMaxSize(),
             posters = viewModel.imageList
         )
     }
 }
 
-@Composable
-fun HomeAppBar(
-    backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        title = {
-            Row {
-                Icon(
-                    painter = painterResource(R.drawable.ic_loco_text_temp),
-                    contentDescription = stringResource(R.string.app_name),
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .heightIn(max = 24.dp)
-                )
-            }
-        },
-        backgroundColor = backgroundColor,
-        actions = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                IconButton(
-                    onClick = { /* TODO: Open Setting */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = stringResource(R.string.setting)
-                    )
-                }
-            }
-        },
-        modifier = modifier
-    )
-}
-
 @ExperimentalPagerApi
 @Composable
 fun HomeContent(
+    navigateToStage: (String) -> Unit,
     modifier: Modifier = Modifier,
     posters: List<String>,
 ) {
@@ -138,6 +107,7 @@ fun HomeContent(
                         modifier = modifier
                     ) { page ->
                         PosterItem(
+                            onClick = navigateToStage,
                             imageUrl = posters[page],
                             modifier = Modifier
                                 .padding(4.dp)
@@ -152,11 +122,46 @@ fun HomeContent(
     }
 }
 
+@Composable
+fun HomeAppBar(
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            Row {
+                Icon(
+                    painter = painterResource(R.drawable.ic_loco_text_temp),
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .heightIn(max = 24.dp)
+                )
+            }
+        },
+        backgroundColor = backgroundColor,
+        actions = {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                IconButton(
+                    onClick = { /* TODO: Open Setting */ }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.setting)
+                    )
+                }
+            }
+        },
+        modifier = modifier
+    )
+}
 
 @Composable
 private fun PosterItem(
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     imageUrl: String? = null,
+    artistUri: String = "artist",
     title: String? = "Title"
 ) {
 
@@ -196,7 +201,7 @@ private fun PosterItem(
                         modifier = Modifier.align(Alignment.BottomEnd)
                     ) {
                         Button(
-                            onClick = {},
+                            onClick = {onClick(artistUri)},
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(10.dp)
@@ -205,7 +210,7 @@ private fun PosterItem(
                         }
 
                         Button(
-                            onClick = {},
+                            onClick = {onClick(artistUri)},
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(10.dp)
@@ -217,16 +222,6 @@ private fun PosterItem(
 
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewPosterItem() {
-    IndieStageTheme {
-        PosterItem(
-            imageUrl = "https://ia902607.us.archive.org/32/items/mbid-76df3287-6cda-33eb-8e9a-044b5e15ffdd/mbid-76df3287-6cda-33eb-8e9a-044b5e15ffdd-829521842_thumb500.jpg"
-        )
     }
 }
 
