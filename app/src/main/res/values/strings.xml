@@ -4,4 +4,5 @@
     <string name="connection_error_message">Check your Network please</string>
     <string name="retry_label">retry</string>
     <string name="setting">Setting</string>
+    <string name="back">back</string>
 </resources>

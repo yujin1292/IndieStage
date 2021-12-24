@@ -28,7 +28,7 @@ import com.jin.android.indiestage.util.contrastAgainst
 import com.jin.android.indiestage.util.rememberDominantColorState
 import com.jin.android.indiestage.util.verticalGradientScrim
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jin.android.indiestage.data.Poster
+import com.jin.android.indiestage.data.Exhibition
 
 
 @ExperimentalPagerApi
@@ -51,7 +51,7 @@ fun Home(
 fun HomeContent(
     navigateToStage: (String) -> Unit,
     modifier: Modifier = Modifier,
-    posters: List<Poster>,
+    posters: List<Exhibition>,
 ) {
     Column {
         val surfaceColor = MaterialTheme.colors.surface
@@ -62,7 +62,7 @@ fun HomeContent(
 
         DynamicThemePrimaryColorsFromImage(dominantColorState) {
             val pagerState = rememberPagerState()
-            val selectedImageUrl = posters.getOrNull(pagerState.currentPage)?.imageUrl
+            val selectedImageUrl = posters.getOrNull(pagerState.currentPage)?.posterImageUrl
 
             // When the selected image url changes, call updateColorsFromImageUrl() or reset()
             LaunchedEffect(selectedImageUrl) {
@@ -159,7 +159,7 @@ fun HomeAppBar(
 private fun PosterItem(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    item:Poster
+    item:Exhibition
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -175,9 +175,9 @@ private fun PosterItem(
                 .aspectRatio(1f)
                 .clickable(onClick = { expanded = !expanded })
         ) {
-            if (item.imageUrl != null) {
+            if (item.posterImageUrl != null) {
                 Image(
-                    painter = rememberImagePainter(data = item.imageUrl),
+                    painter = rememberImagePainter(data = item.posterImageUrl),
                     contentDescription = item.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
