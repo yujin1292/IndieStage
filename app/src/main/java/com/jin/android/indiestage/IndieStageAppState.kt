@@ -17,12 +17,12 @@ import androidx.navigation.compose.rememberNavController
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object TicketBox : Screen("ticketBox")
-    object Stage : Screen("stage/{stageUri}") {
-        fun createRoute(stageUri: String) = "stage/$stageUri"
+    object Stage : Screen("stage/{exhibitionId}") {
+        fun createRoute(exhibitionId: String) = "stage/$exhibitionId"
     }
-    object ArtWork : Screen("stage/{stageUri}/{artWorkUri}/{mode}/{page}") {
-        fun createRoute(stageUri: String, artWorkUri: String, mode: String, page: Int) =
-            "stage/$stageUri/$artWorkUri/$mode/$page"
+    object ArtWork : Screen("stage/{exhibitionId}/{artWorkUri}/{mode}/{page}") {
+        fun createRoute(exhibitionId: String, artWorkUri: String, mode: String, page: Int) =
+            "stage/$exhibitionId/$artWorkUri/$mode/$page"
     }
 }
 
@@ -45,11 +45,11 @@ class IndieStageAppState(
         isOnline = checkIfOnline()
     }
 
-    fun navigateToStage(stageUri: String, from: NavBackStackEntry) {
+    fun navigateToStage(exhibitionId: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
-            val encodedUri = Uri.encode(stageUri)
-            navController.navigate(Screen.Stage.createRoute(encodedUri))
+            val encodedId = Uri.encode(exhibitionId)
+            navController.navigate(Screen.Stage.createRoute(encodedId))
         }
     }
 
@@ -58,20 +58,20 @@ class IndieStageAppState(
     }
 
     fun navigateToArtWork(
-        stageUri: String,
+        exhibitionId: String,
         artWorkUri: String,
         mode: String,
         page: Int,
         from: NavBackStackEntry
     ) {
         if (from.lifecycleIsResumed()) {
-            val encodedArtistUri = Uri.encode(stageUri)
+            val encodedExhibitionId = Uri.encode(exhibitionId)
             val encodedArtWorkUri = Uri.encode(artWorkUri)
             val encodedModeUri = Uri.encode(mode)
 
             navController.navigate(
                 Screen.ArtWork.createRoute(
-                    stageUri = encodedArtistUri,
+                    exhibitionId = encodedExhibitionId,
                     artWorkUri = encodedArtWorkUri,
                     mode = encodedModeUri,
                     page = page

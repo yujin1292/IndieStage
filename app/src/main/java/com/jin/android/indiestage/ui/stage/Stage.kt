@@ -1,57 +1,89 @@
 package com.jin.android.indiestage.ui.stage
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.util.Log
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.jin.android.indiestage.R
+import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
+import com.jin.android.indiestage.util.StageViewModelFactory
 
 @Composable
 fun Stage(
     onBackPress: () -> Unit,
     navigateToArtWork: (stageUri: String, artWorkUri: String, mode: String, page: Int) -> Unit,
-    stageUri: String,
-    viewModel: StageViewModel = viewModel()
+    exhibitionId: String,
+    viewModel: StageViewModel = viewModel(
+        factory = StageViewModelFactory(
+            exhibitionRepo = ExhibitionRepo(),
+            exhibitionId = exhibitionId
+        )
+    )
 ) {
-    viewModel.exhibition.title = stageUri
-    Box(Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_loco_text_temp),
-            contentDescription = "poster",
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color(20,20,20,9))
-        )
-        StageContent(
-            onBackPress = onBackPress,
-            navigateToArtWork = navigateToArtWork,
-            viewModel = viewModel
-        )
+    when (val exhibitions = viewModel.exhibitionStateFlow.collectAsState().value) {
+        is OnError -> {
+            Log.e("stage", exhibitions.exception.toString())
+            Text("Error")
+        }
+        is OnSuccess -> {
+            exhibitions.querySnapshot?.toObjects(Exhibition::class.java)?.let {
+                //Log.d("stage",it.toString())
+                Box(Modifier.fillMaxSize()) {
+                    Image(
+                        painter = rememberImagePainter(data = it[0].image),
+                        contentDescription = "poster",
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = colorResource(id = R.color.shadow50)
+                    ) {}
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(15.dp)) {
+                        StageAppBar(viewModel = viewModel, onBackPress = onBackPress)
+                        StageContent(
+                            navigateToArtWork = navigateToArtWork,
+                            viewModel = viewModel
+                        )
+                    }
+
+                }
+            }
+        }
     }
+
 }
 
 @Composable
 fun StageContent(
-    onBackPress: () -> Unit,
     navigateToArtWork: (
         stageUri: String,
         artWorkUri: String,
@@ -60,9 +92,8 @@ fun StageContent(
     ) -> Unit,
     viewModel: StageViewModel
 ) {
-    Column(modifier = Modifier.padding(20.dp)) {
-        StageAppBar(viewModel = viewModel, onBackPress = onBackPress)
-        StageArtistIntro(viewModel.artistInformation)
+    Column(Modifier.verticalScroll(rememberScrollState())) {
+        StageArtistIntro(viewModel)
         WorkList(navigateToArtWork, viewModel)
     }
 }
@@ -85,41 +116,75 @@ fun StageAppBar(
 
 @Composable
 fun StageArtistIntro(
-    artistInformation: ArtistInfo
+    viewModel: StageViewModel
 ) {
-    Column() {
-        Text("작가 소개")
-        Row(
-            verticalAlignment = CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.LightGray)
-                .aspectRatio(2f)
-        ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "artist pic",
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(0.8f)
-                    .clip(
-                        shape = CutCornerShape(
-                            topStart = 5.dp,
-                            bottomEnd = 5.dp
-                        )
-                    )
-                    .background(Color.DarkGray)
-                    .padding(10.dp)
-            )
-            Column(
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 20.dp)
-                    .fillMaxSize()
-            ) {
-                Text(artistInformation.artistName)
-                Text(artistInformation.Describe)
+    when (val artistResponse = viewModel.getArtistInfo().collectAsState(null).value) {
+        is ArtistOnError -> {
+            Log.e("stage", artistResponse.exception.toString())
+            Text("Error")
+        }
+        is ArtistOnSuccess -> {
+            artistResponse.querySnapshot?.toObjects(Artist::class.java)?.let {
+                Log.d("stage", it.toString())
+                ArtistInfoScreen(it[0])
             }
+
+        }
+    }
+}
+
+@Composable
+fun ArtistInfoScreen(artist: Artist) {
+    Card(
+        contentColor = Color.DarkGray,
+        backgroundColor = colorResource(R.color.text_background),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(10.dp)) {
+            Image(
+                painter = rememberImagePainter(data = artist.image),
+                contentDescription = "artist pic",
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1.5f)
+                    .clip(shape = RoundedCornerShape(10.dp))
+            )
+
+            Text(
+                text = artist.name,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Black
+            )
+            Text(
+                text = artist.intro.replace("\\n", "\n\n"),
+                fontSize = 12.sp
+            )
+
+
+            Text(
+                text = stringResource(id = R.string.contact),
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                fontSize = 12.sp,
+                text = artist.email
+            )
+            Text(
+                fontSize = 12.sp,
+                text = artist.homepage
+            )
+
+            Text(
+                text = stringResource(id = R.string.history),
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                text = artist.history.replace("\\n", "\n\n"),
+                fontSize = 12.sp,
+            )
         }
     }
 }
@@ -134,14 +199,24 @@ fun WorkList(
     ) -> Unit,
     viewModel: StageViewModel
 ) {
-    Column() {
-        Text("전시 항목")
-        LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-            items(items = viewModel.artWorkList) { work ->
-                WorkElement(navigateToArtWork = navigateToArtWork, item = work)
+    when (val artWorkResponse = viewModel.getArtWorkInfo().collectAsState(null).value) {
+        is ArtWorkOnError -> {
+            Log.e("stage", artWorkResponse.exception.toString())
+            Text("Error")
+        }
+        is ArtWorkOnSuccess -> {
+            artWorkResponse.querySnapshot?.toObjects(ArtWork::class.java)?.let {
+                Column() {
+                    LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
+                        items(items = it) { work ->
+                            WorkElement(navigateToArtWork = navigateToArtWork, item = work)
+                        }
+                    }
+                }
             }
         }
     }
+
 
 }
 
@@ -153,29 +228,35 @@ fun WorkElement(
         mode: String,
         page: Int
     ) -> Unit,
-    item: ArtWorkInfo
+    item: ArtWork
 ) {
     Card(
         modifier = Modifier
-            .clickable { navigateToArtWork(")a", "b", "c", 0) }
-            .fillMaxWidth()
-            .aspectRatio(3f)
+            .clickable { navigateToArtWork("a", "b", "c", 0) }
+            .height(300.dp)
+            .aspectRatio(0.7f)
+            .padding(end = 10.dp)
     ) {
-        Row(
-            verticalAlignment = CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
+        Box {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = rememberImagePainter(data = item.image[0]),
                 contentDescription = "image",
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-            Column() {
-                Text(item.title)
-                Text("Description")
-            }
+            Text(
+                text = item.title,
+                fontSize = 14.sp,
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Center)
+                    .background(colorResource(id = R.color.text_background))
+            )
         }
+
     }
 }
 
@@ -183,23 +264,6 @@ fun WorkElement(
 @Composable
 fun PreviewArtist() {
     IndieStageTheme {
-        StageArtistIntro(
-            artistInformation = ArtistInfo(
-                " ",
-                "name",
-                "소개말"
-            )
-        )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewWorkElement() {
-    IndieStageTheme {
-        WorkElement(
-            navigateToArtWork = { _, _, _, _ -> },
-            ArtWorkInfo("artworkUri", "image", "title")
-        )
+        ArtistInfoScreen(Artist())
     }
 }

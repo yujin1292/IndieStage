@@ -8,14 +8,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.jin.android.indiestage.ui.artwork.ArtWork
+import com.jin.android.indiestage.ui.artwork.ArtWorkScreen
 import com.jin.android.indiestage.ui.home.Home
 import com.jin.android.indiestage.ui.stage.Stage
 
 @ExperimentalPagerApi
 @Composable
-fun IndieStageApp(appState: IndieStageAppState = rememberIndieStageAppState()) {
-
+fun IndieStageApp(
+    appState: IndieStageAppState = rememberIndieStageAppState()
+) {
     if (appState.isOnline) {
         NavHost(
             navController = appState.navController,
@@ -29,13 +30,13 @@ fun IndieStageApp(appState: IndieStageAppState = rememberIndieStageAppState()) {
                 )
             }
             composable(Screen.Stage.route) { backStageEntry ->
-                backStageEntry.arguments?.getString("stageUri")?.let {
+                backStageEntry.arguments?.getString("exhibitionId")?.let {
                     Stage(
                         onBackPress = appState::navigateBack,
-                        stageUri = it,
-                        navigateToArtWork = { stageUri, artWorkUri, mode, page ->
+                        exhibitionId = it,
+                        navigateToArtWork = { stageUri, artWorkUri, mode, page -> //TODO 인자 변경
                             appState.navigateToArtWork(
-                                stageUri = stageUri,
+                                exhibitionId = stageUri,
                                 artWorkUri = artWorkUri,
                                 mode = mode,
                                 page = page,
@@ -45,8 +46,8 @@ fun IndieStageApp(appState: IndieStageAppState = rememberIndieStageAppState()) {
                     )
                 }
             }
-            composable(Screen.ArtWork.route){
-                ArtWork()
+            composable(Screen.ArtWork.route) {
+                ArtWorkScreen()
             }
         }
     } else {

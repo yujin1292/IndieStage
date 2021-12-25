@@ -1,31 +1,39 @@
 package com.jin.android.indiestage.ui.stage
 
 import androidx.lifecycle.ViewModel
-import com.jin.android.indiestage.data.Exhibition
+import androidx.lifecycle.viewModelScope
+import com.jin.android.indiestage.data.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
-class StageViewModel() : ViewModel() {
+class StageViewModel(
+    private val exhibitionRepo: ExhibitionRepo,
+    private val exhibitionId:String
+) : ViewModel() {
 
-    var exhibition = Exhibition("stageuri", "전시명", "imageUri", "name", "description")
+    val exhibitionStateFlow = MutableStateFlow<ExhibitionResponse?>(null)
+    val artistStateFlow = MutableStateFlow<ArtistResponse?>(null)
+    val artWorkStateFlow = MutableStateFlow<ArtWorkResponse?>(null)
+    init {
+        viewModelScope.launch {
+            exhibitionRepo.getExhibitionsById(exhibitionId).collect {
+                exhibitionStateFlow.value = it
+            }
 
-    var artistInformation = ArtistInfo("artist", "yujin", "안녕하세요")
-    var artWorkList = mutableListOf<ArtWorkInfo>(
-        ArtWorkInfo("1", "uri", "one"),
-        ArtWorkInfo("1", "uri", "two"),
-        ArtWorkInfo("1", "uri", "three"),
-        ArtWorkInfo("1", "uri", "four")
-    )
+            /*exhibitionRepo.getArtist(exhibitionId).collect{
+                artistStateFlow.value = it
+            }*/
+        }
+    }
+
+    fun getExhibitionInfo() = exhibitionRepo.getExhibitions()
+    fun getArtistInfo() = exhibitionRepo.getArtist(exhibitionId)
+    fun getArtWorkInfo() = exhibitionRepo.getArtWorks(exhibitionId)
+
+    var exhibition = Exhibition()
+    var artistInformation = Artist()
+    var artWorkList = mutableListOf<ArtWork>()
 
 }
 
-
-data class ArtistInfo(
-    val artistUri: String,
-    val artistName: String,
-    val Describe: String
-)
-
-data class ArtWorkInfo(
-    val artworkUri: String,
-    val tumbnailUri: String,
-    val title: String
-)
