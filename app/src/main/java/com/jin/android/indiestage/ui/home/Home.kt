@@ -1,5 +1,6 @@
 package com.jin.android.indiestage.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,25 +24,25 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.ui.theme.MinContrastOfPrimaryVsSurface
-import com.jin.android.indiestage.util.DynamicThemePrimaryColorsFromImage
-import com.jin.android.indiestage.util.contrastAgainst
-import com.jin.android.indiestage.util.rememberDominantColorState
-import com.jin.android.indiestage.util.verticalGradientScrim
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jin.android.indiestage.data.Exhibition
+import com.jin.android.indiestage.data.ExhibitionRepo
+import com.jin.android.indiestage.data.OnError
+import com.jin.android.indiestage.data.OnSuccess
+import com.jin.android.indiestage.util.*
 
 
 @ExperimentalPagerApi
 @Composable
 fun Home(
     navigateToStage: (String) -> Unit, //TODO navigateToTicketBox 으로 변경
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(ExhibitionRepo()))
 ) {
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
             navigateToStage = navigateToStage,
             modifier = Modifier.fillMaxSize(),
-            posters = viewModel.tempData
+            viewModel = viewModel
         )
     }
 }
@@ -51,7 +52,7 @@ fun Home(
 fun HomeContent(
     navigateToStage: (String) -> Unit,
     modifier: Modifier = Modifier,
-    posters: List<Exhibition>,
+    viewModel: HomeViewModel
 ) {
     Column {
         val surfaceColor = MaterialTheme.colors.surface
@@ -60,64 +61,72 @@ fun HomeContent(
             color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
         }
 
-        DynamicThemePrimaryColorsFromImage(dominantColorState) {
-            val pagerState = rememberPagerState()
-            val selectedImageUrl = posters.getOrNull(pagerState.currentPage)?.posterImageUrl
-
-            // When the selected image url changes, call updateColorsFromImageUrl() or reset()
-            LaunchedEffect(selectedImageUrl) {
-                if (selectedImageUrl != null) {
-                    dominantColorState.updateColorsFromImageUrl(selectedImageUrl)
-                } else {
-                    dominantColorState.reset()
-                }
+        when (val exhibitions = viewModel.exhibitionStateFlow.collectAsState().value) {
+            is OnError -> {
+                Log.e("home", exhibitions.exception.toString())
+                Text("Error")
             }
+            is OnSuccess -> {
+                exhibitions.querySnapshot?.toObjects(Exhibition::class.java)?.let {
+                    DynamicThemePrimaryColorsFromImage(dominantColorState) {
+                        val pagerState = rememberPagerState()
+                        val selectedImageUrl = it.getOrNull(pagerState.currentPage)?.image
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalGradientScrim(
-                        color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                        startYPercentage = 1f,
-                        endYPercentage = 0f
-                    )
-            ) {
-                //val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
-                val appBarColor = Color.Transparent
+                        // When the selected image url changes, call updateColorsFromImageUrl() or reset()
+                        LaunchedEffect(selectedImageUrl) {
+                            if (selectedImageUrl != null) {
+                                dominantColorState.updateColorsFromImageUrl(selectedImageUrl)
+                            } else {
+                                dominantColorState.reset()
+                            }
+                        }
 
-                Spacer(
-                    Modifier
-                        .background(appBarColor)
-                        .fillMaxWidth()
-                )
-
-                HomeAppBar(
-                    backgroundColor = appBarColor,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-                if (posters.isNotEmpty()) {
-                    Spacer(Modifier.height(16.dp))
-
-                    HorizontalPager(
-                        count = posters.size,
-                        state = pagerState,
-                        modifier = modifier
-                    ) { page ->
-                        PosterItem(
-                            onClick = navigateToStage,
-                            item = posters[page],
+                        Column(
                             modifier = Modifier
-                                .padding(4.dp)
-                                .fillMaxHeight()
-                        )
+                                .fillMaxWidth()
+                                .verticalGradientScrim(
+                                    color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
+                                    startYPercentage = 1f,
+                                    endYPercentage = 0f
+                                )
+                        ) {
+                            //val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+                            val appBarColor = Color.Transparent
+
+                            Spacer(
+                                Modifier
+                                    .background(appBarColor)
+                                    .fillMaxWidth()
+                            )
+
+                            HomeAppBar(
+                                backgroundColor = appBarColor,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+
+                            if (it.isNotEmpty()) {
+                                Spacer(Modifier.height(16.dp))
+                                HorizontalPager(
+                                    count = it.size,
+                                    state = pagerState,
+                                    modifier = modifier
+                                ) { page ->
+                                    PosterItem(
+                                        onClick = navigateToStage,
+                                        item = it[page],
+                                        modifier = Modifier
+                                            .padding(4.dp)
+                                            .fillMaxHeight()
+                                    )
+                                }
+                                Spacer(Modifier.height(16.dp))
+                            }
+                        }
                     }
-                    Spacer(Modifier.height(16.dp))
                 }
             }
         }
-
     }
 }
 
@@ -159,9 +168,8 @@ fun HomeAppBar(
 private fun PosterItem(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    item:Exhibition
+    item: Exhibition
 ) {
-
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -172,12 +180,12 @@ private fun PosterItem(
             Modifier
                 .weight(1f)
                 .align(Alignment.CenterHorizontally)
-                .aspectRatio(1f)
+                .aspectRatio(0.7f)
                 .clickable(onClick = { expanded = !expanded })
         ) {
-            if (item.posterImageUrl != null) {
+            if (item.image != null) {
                 Image(
-                    painter = rememberImagePainter(data = item.posterImageUrl),
+                    painter = rememberImagePainter(data = item.image),
                     contentDescription = item.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -193,9 +201,9 @@ private fun PosterItem(
                         .fillMaxSize()
                         .align(Alignment.Center)
                 ) {
-                    Row( verticalAlignment = Alignment.CenterVertically){
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Button(
-                            onClick = {onClick(item.stageUri)},
+                            onClick = { onClick(item.id) },
                             modifier = Modifier
                                 .padding(10.dp)
                                 .fillMaxWidth()

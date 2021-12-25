@@ -4,6 +4,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun ArtWork(){
+fun ArtWorkScreen(){
     Text("ArtWork")
 }
