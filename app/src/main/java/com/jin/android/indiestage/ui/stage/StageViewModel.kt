@@ -21,19 +21,12 @@ class StageViewModel(
                 exhibitionStateFlow.value = it
             }
 
-            /*exhibitionRepo.getArtist(exhibitionId).collect{
-                artistStateFlow.value = it
-            }*/
         }
     }
 
     fun getExhibitionInfo() = exhibitionRepo.getExhibitions()
     fun getArtistInfo() = exhibitionRepo.getArtist(exhibitionId)
     fun getArtWorkInfo() = exhibitionRepo.getArtWorks(exhibitionId)
-
-    var exhibition = Exhibition()
-    var artistInformation = Artist()
-    var artWorkList = mutableListOf<ArtWork>()
 
 }
 

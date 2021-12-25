@@ -34,20 +34,35 @@ fun IndieStageApp(
                     Stage(
                         onBackPress = appState::navigateBack,
                         exhibitionId = it,
-                        navigateToArtWork = { stageUri, artWorkUri, mode, page -> //TODO 인자 변경
+                        navigateToArtWork = { exhibitionId, artWorkId, mode ->
                             appState.navigateToArtWork(
-                                exhibitionId = stageUri,
-                                artWorkUri = artWorkUri,
+                                exhibitionId = exhibitionId,
+                                artWorkId = artWorkId,
                                 mode = mode,
-                                page = page,
                                 from = backStageEntry
                             )
                         }
                     )
                 }
             }
-            composable(Screen.ArtWork.route) {
-                ArtWorkScreen()
+            composable(Screen.ArtWork.route) { backStageEntry ->
+
+                val exhibitionId: String = backStageEntry.arguments?.getString("exhibitionId").run {
+                    this ?: "null"
+                }
+                val artWorkId: String = backStageEntry.arguments?.getString("artWorkId").run {
+                    this ?: "null"
+                }
+                val mode: String = backStageEntry.arguments?.getString("mode").run {
+                    this ?: "null"
+                }
+
+                ArtWorkScreen(
+                    onBackPress = appState::navigateBack,
+                    exhibitionId = exhibitionId,
+                    artWorkId = artWorkId,
+                    mode = mode
+                )
             }
         }
     } else {
