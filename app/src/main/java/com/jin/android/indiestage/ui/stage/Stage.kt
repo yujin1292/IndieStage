@@ -199,11 +199,11 @@ fun WorkList(
     viewModel: StageViewModel
 ) {
     when (val artWorkResponse = viewModel.getArtWorkInfo().collectAsState(null).value) {
-        is ArtWorkOnError -> {
+        is ArtWorksOnError -> {
             Log.e("stage", artWorkResponse.exception.toString())
             Text("Error")
         }
-        is ArtWorkOnSuccess -> {
+        is ArtWorksOnSuccess -> {
             artWorkResponse.querySnapshot?.toObjects(ArtWork::class.java)?.let {
                 Column() {
                     LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {

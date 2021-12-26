@@ -1,8 +1,8 @@
 package com.jin.android.indiestage.data
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -71,6 +71,27 @@ class ExhibitionRepo {
         val collection = firestore.collection("exhibition")
             .document(id)
             .collection("artwork")
+
+        val snapshotListener = collection.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                ArtWorksOnSuccess(value)
+            } else {
+                ArtWorksOnError(error)
+            }
+
+            this.trySend(response).isSuccess
+        }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    fun getArtWork(exhibitionId:String, artWorkId:String) =  callbackFlow {
+        val collection = firestore.collection("exhibition")
+            .document(exhibitionId)
+            .collection("artwork")
+            .document(artWorkId)
 
         val snapshotListener = collection.addSnapshotListener { value, error ->
             val response = if (error == null) {
