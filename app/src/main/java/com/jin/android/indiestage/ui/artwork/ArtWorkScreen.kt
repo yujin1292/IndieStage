@@ -9,6 +9,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -56,7 +57,8 @@ fun ArtWorkScreen(
                 Log.d("art work", artWork.toString())
                 ArtWorkContents(
                     onBackPress = onBackPress,
-                    artWork = artWork
+                    artWork = artWork,
+                    mode = mode
                 )
             }
         }
@@ -84,7 +86,7 @@ fun ArtWorkAppbar(
 
 @ExperimentalPagerApi
 @Composable
-fun ArtWorkPager(artWork: ArtWork) {
+fun ArtWorkPager(artWork: ArtWork, mode: String) {
     val pagerState = rememberPagerState()
     Row(Modifier.fillMaxSize()) {
         Column(
@@ -98,7 +100,8 @@ fun ArtWorkPager(artWork: ArtWork) {
             ) { page ->
                 ArtWorkPage(
                     page,
-                    artWork.contents[page]
+                    artWork.contents[page],
+                    mode
                 )
             }
 
@@ -117,9 +120,21 @@ fun ArtWorkPager(artWork: ArtWork) {
 @Composable
 fun ArtWorkPage(
     page: Int,
+    content: Content,
+    mode: String
+) {
+    if (mode == "auth") {
+        authPage(page = page, content = content)
+    } else {
+        guestPage()
+    }
+}
+
+@Composable
+fun authPage(
+    page: Int,
     content: Content
 ) {
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,15 +171,32 @@ fun ArtWorkPage(
     }
 }
 
+@Composable
+fun guestPage() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(0.7f)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Lock,
+            contentDescription = "lock",
+            modifier = Modifier
+                .align(Alignment.Center)
+        )
+    }
+}
+
 @ExperimentalPagerApi
 @Composable
 fun ArtWorkContents(
     onBackPress: () -> Unit,
-    artWork: ArtWork
+    artWork: ArtWork,
+    mode: String
 ) {
     Column() {
         ArtWorkAppbar(title = artWork.title, onBackPress = onBackPress)
-        ArtWorkPager(artWork)
+        ArtWorkPager(artWork, mode)
     }
 }
 
@@ -173,7 +205,7 @@ fun ArtWorkContents(
 fun PreviewPage() {
     IndieStageTheme() {
         Column() {
-            ArtWorkPage(0, Content())
+            ArtWorkPage(0, Content(), "auth")
         }
     }
 }
