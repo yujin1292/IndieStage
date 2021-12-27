@@ -237,7 +237,7 @@ fun WorkElement(
     ) {
         Box {
             Image(
-                painter = rememberImagePainter(data = item.image[0]),
+                painter = rememberImagePainter(data = item.contents[0].image),
                 contentDescription = "image",
                 modifier = Modifier
                     .padding(5.dp)

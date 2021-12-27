@@ -91,7 +91,7 @@ fun ArtWorkPage(artWork: ArtWork) {
             .aspectRatio(0.7f)
     ) {
         Image(
-            painter = rememberImagePainter(data = artWork.image[page]),
+            painter = rememberImagePainter(data = artWork.contents[page].image),
             contentDescription = "page",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
@@ -101,7 +101,7 @@ fun ArtWorkPage(artWork: ArtWork) {
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
         ) {
-            artWork.text[page].split("\\n").forEach {
+            artWork.contents[page].text.split("\\n").forEach {
                 Text(
                     text = it,
                     textAlign = TextAlign.Left,
