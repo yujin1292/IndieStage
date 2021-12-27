@@ -205,7 +205,7 @@ fun WorkList(
         }
         is ArtWorksOnSuccess -> {
             artWorkResponse.querySnapshot?.toObjects(ArtWork::class.java)?.let {
-                Column() {
+                Column {
                     LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
                         items(items = it) { work ->
                             WorkElement(navigateToArtWork = navigateToArtWork, item = work, exhibitionId = exhibitionId)

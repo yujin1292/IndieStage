@@ -80,7 +80,7 @@ fun ArtWorkAppbar(
                 contentDescription = stringResource(R.string.back)
             )
         }
-        Text(modifier = Modifier.align(Alignment.CenterVertically), text = title)
+        Text(modifier = Modifier.align(CenterVertically), text = title)
     }
 }
 
@@ -124,14 +124,14 @@ fun ArtWorkPage(
     mode: String
 ) {
     if (mode == "auth") {
-        authPage(page = page, content = content)
+        AuthPage(page = page, content = content)
     } else {
-        guestPage()
+        GuestPage()
     }
 }
 
 @Composable
-fun authPage(
+fun AuthPage(
     page: Int,
     content: Content
 ) {
@@ -172,7 +172,7 @@ fun authPage(
 }
 
 @Composable
-fun guestPage() {
+fun GuestPage() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -194,7 +194,7 @@ fun ArtWorkContents(
     artWork: ArtWork,
     mode: String
 ) {
-    Column() {
+    Column {
         ArtWorkAppbar(title = artWork.title, onBackPress = onBackPress)
         ArtWorkPager(artWork, mode)
     }
@@ -203,8 +203,8 @@ fun ArtWorkContents(
 @Preview
 @Composable
 fun PreviewPage() {
-    IndieStageTheme() {
-        Column() {
+    IndieStageTheme {
+        Column {
             ArtWorkPage(0, Content(), "auth")
         }
     }

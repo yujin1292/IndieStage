@@ -36,7 +36,7 @@ class ArtWorkViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ArtWorkViewModel::class.java)) {
-            return ArtWorkViewModel(exhibitionRepo, exhibitionId, artWorkId, mode) as T
+            return ArtWorkViewModel(exhibitionRepo, exhibitionId, artWorkId) as T
         }
         throw IllegalStateException()
     }

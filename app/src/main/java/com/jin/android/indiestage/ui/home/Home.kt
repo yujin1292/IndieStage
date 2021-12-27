@@ -183,16 +183,14 @@ private fun PosterItem(
                 .aspectRatio(0.7f)
                 .clickable(onClick = { expanded = !expanded })
         ) {
-            if (item.image != null) {
-                Image(
-                    painter = rememberImagePainter(data = item.image),
-                    contentDescription = item.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(MaterialTheme.shapes.medium),
-                )
-            }
+            Image(
+                painter = rememberImagePainter(data = item.image),
+                contentDescription = item.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(MaterialTheme.shapes.medium),
+            )
 
             if (expanded) {
                 Surface(

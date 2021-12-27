@@ -11,8 +11,7 @@ import kotlinx.coroutines.launch
 class ArtWorkViewModel(
     private val exhibitionRepo: ExhibitionRepo,
     private val exhibitionId: String,
-    private val artWorkId: String,
-    private val mode: String
+    private val artWorkId: String
 ) : ViewModel() {
 
     val artWorkStateFlow = MutableStateFlow<ArtWorkResponse?>(null)
