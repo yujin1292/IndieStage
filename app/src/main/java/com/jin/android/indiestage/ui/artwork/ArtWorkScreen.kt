@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -20,16 +21,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
-import com.google.firebase.firestore.ktx.toObject
-import com.jin.android.indiestage.IndieStageApp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.ArtWork
-import com.jin.android.indiestage.data.ArtWorkOnError
-import com.jin.android.indiestage.data.ArtWorkOnSuccess
-import com.jin.android.indiestage.data.ExhibitionRepo
+import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 import com.jin.android.indiestage.util.ArtWorkViewModelFactory
 
+@ExperimentalPagerApi
 @Composable
 fun ArtWorkScreen(
     onBackPress: () -> Unit,
@@ -81,9 +82,43 @@ fun ArtWorkAppbar(
     }
 }
 
+@ExperimentalPagerApi
 @Composable
-fun ArtWorkPage(artWork: ArtWork) {
-    val page by remember { mutableStateOf(0) }
+fun ArtWorkPager(artWork: ArtWork) {
+    val pagerState = rememberPagerState()
+    Row(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.align(CenterVertically)
+        ) {
+            HorizontalPager(
+                count = artWork.pageNum,
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) { page ->
+                ArtWorkPage(
+                    page,
+                    artWork.contents[page]
+                )
+            }
+
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+
+}
+
+
+@Composable
+fun ArtWorkPage(
+    page: Int,
+    content: Content
+) {
 
     Box(
         modifier = Modifier
@@ -91,7 +126,7 @@ fun ArtWorkPage(artWork: ArtWork) {
             .aspectRatio(0.7f)
     ) {
         Image(
-            painter = rememberImagePainter(data = artWork.contents[page].image),
+            painter = rememberImagePainter(data = content.image),
             contentDescription = "page",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
@@ -101,7 +136,7 @@ fun ArtWorkPage(artWork: ArtWork) {
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
         ) {
-            artWork.contents[page].text.split("\\n").forEach {
+            content.text.split("\\n").forEach {
                 Text(
                     text = it,
                     textAlign = TextAlign.Left,
@@ -121,6 +156,7 @@ fun ArtWorkPage(artWork: ArtWork) {
     }
 }
 
+@ExperimentalPagerApi
 @Composable
 fun ArtWorkContents(
     onBackPress: () -> Unit,
@@ -128,7 +164,7 @@ fun ArtWorkContents(
 ) {
     Column() {
         ArtWorkAppbar(title = artWork.title, onBackPress = onBackPress)
-        ArtWorkPage(artWork)
+        ArtWorkPager(artWork)
     }
 }
 
@@ -137,7 +173,7 @@ fun ArtWorkContents(
 fun PreviewPage() {
     IndieStageTheme() {
         Column() {
-            ArtWorkPage(ArtWork())
+            ArtWorkPage(0, Content())
         }
     }
 }
