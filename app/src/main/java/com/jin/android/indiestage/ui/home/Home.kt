@@ -35,12 +35,12 @@ import com.jin.android.indiestage.util.*
 @ExperimentalPagerApi
 @Composable
 fun Home(
-    navigateToStage: (String) -> Unit, //TODO navigateToTicketBox 으로 변경
+    navigateToTicketBox: (String) -> Unit, //TODO navigateToTicketBox 으로 변경
     viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(ExhibitionRepo()))
 ) {
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
-            navigateToStage = navigateToStage,
+            navigateToTicketBox = navigateToTicketBox,
             modifier = Modifier.fillMaxSize(),
             viewModel = viewModel
         )
@@ -50,7 +50,7 @@ fun Home(
 @ExperimentalPagerApi
 @Composable
 fun HomeContent(
-    navigateToStage: (String) -> Unit,
+    navigateToTicketBox: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel
 ) {
@@ -113,7 +113,7 @@ fun HomeContent(
                                     modifier = modifier
                                 ) { page ->
                                     PosterItem(
-                                        onClick = navigateToStage,
+                                        onClick = navigateToTicketBox,
                                         item = it[page],
                                         modifier = Modifier
                                             .padding(4.dp)

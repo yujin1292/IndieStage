@@ -32,12 +32,15 @@ import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 import com.jin.android.indiestage.util.StageViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @Composable
 fun Stage(
     onBackPress: () -> Unit,
     navigateToArtWork: (exhibitionId: String, artWorkId: String, mode: String) -> Unit,
     exhibitionId: String,
+    mode: String,
     viewModel: StageViewModel = viewModel(
         factory = StageViewModelFactory(
             exhibitionRepo = ExhibitionRepo(),
@@ -64,14 +67,17 @@ fun Stage(
                         modifier = Modifier.fillMaxSize(),
                         color = colorResource(id = R.color.shadow50)
                     ) {}
-                    Column(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(15.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(15.dp)
+                    ) {
                         StageAppBar(title = it[0].title, onBackPress = onBackPress)
                         StageContent(
                             navigateToArtWork = navigateToArtWork,
                             viewModel = viewModel,
-                            exhibitionId = exhibitionId
+                            exhibitionId = exhibitionId,
+                            mode = mode
                         )
                     }
 
@@ -90,17 +96,18 @@ fun StageContent(
         mode: String
     ) -> Unit,
     exhibitionId: String,
+    mode:String,
     viewModel: StageViewModel
 ) {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         StageArtistIntro(viewModel)
-        WorkList(navigateToArtWork, exhibitionId, viewModel)
+        WorkList(navigateToArtWork, exhibitionId, mode,viewModel)
     }
 }
 
 @Composable
 fun StageAppBar(
-    title:String,
+    title: String,
     onBackPress: () -> Unit
 ) {
     Row(Modifier.fillMaxWidth()) {
@@ -126,7 +133,7 @@ fun StageArtistIntro(
         is ArtistOnSuccess -> {
             artistResponse.querySnapshot?.toObjects(Artist::class.java)?.let {
                 Log.d("stage", it.toString())
-                if(it.size>0) ArtistInfoScreen(it[0])
+                if (it.size > 0) ArtistInfoScreen(it[0])
             }
         }
     }
@@ -196,6 +203,7 @@ fun WorkList(
         mode: String
     ) -> Unit,
     exhibitionId: String,
+    mode:String,
     viewModel: StageViewModel
 ) {
     when (val artWorkResponse = viewModel.getArtWorkInfo().collectAsState(null).value) {
@@ -208,7 +216,12 @@ fun WorkList(
                 Column {
                     LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
                         items(items = it) { work ->
-                            WorkElement(navigateToArtWork = navigateToArtWork, item = work, exhibitionId = exhibitionId)
+                            WorkElement(
+                                navigateToArtWork = navigateToArtWork,
+                                item = work,
+                                exhibitionId = exhibitionId,
+                                mode = mode
+                            )
                         }
                     }
                 }
@@ -226,11 +239,12 @@ fun WorkElement(
         mode: String
     ) -> Unit,
     exhibitionId: String,
+    mode: String,
     item: ArtWork
 ) {
     Card(
         modifier = Modifier
-            .clickable { navigateToArtWork(exhibitionId, item.id, "auth") } // TODO mode 변경
+            .clickable { navigateToArtWork(exhibitionId, item.id, mode) } // TODO mode 변경
             .height(300.dp)
             .aspectRatio(0.7f)
             .padding(end = 10.dp)

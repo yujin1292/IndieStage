@@ -16,9 +16,11 @@ import androidx.navigation.compose.rememberNavController
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
-    object TicketBox : Screen("ticketBox")
-    object Stage : Screen("stage/{exhibitionId}") {
-        fun createRoute(exhibitionId: String) = "stage/$exhibitionId"
+    object TicketBox : Screen("ticketBox/{exhibitionId}"){
+        fun createRoute(exhibitionId: String) = "ticketBox/$exhibitionId"
+    }
+    object Stage : Screen("stage/{exhibitionId}/{mode}") {
+        fun createRoute(exhibitionId: String, mode:String) = "stage/$exhibitionId/$mode"
     }
     object ArtWork : Screen("stage/{exhibitionId}/{artWorkId}/{mode}") {
         fun createRoute(exhibitionId: String, artWorkId: String, mode: String) =
@@ -45,16 +47,21 @@ class IndieStageAppState(
         isOnline = checkIfOnline()
     }
 
-    fun navigateToStage(exhibitionId: String, from: NavBackStackEntry) {
+    fun navigateToStage(exhibitionId: String, mode:String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
+            navController.popBackStack()
             val encodedId = Uri.encode(exhibitionId)
-            navController.navigate(Screen.Stage.createRoute(encodedId))
+            val encodedMode = Uri.encode(mode)
+            navController.navigate(Screen.Stage.createRoute(encodedId, encodedMode))
         }
     }
 
-    fun navigateToTicketBox(){
-
+    fun navigateToTicketBox(exhibitionId: String, from: NavBackStackEntry){
+        if (from.lifecycleIsResumed()) {
+            val encodedId = Uri.encode(exhibitionId)
+            navController.navigate(Screen.TicketBox.createRoute(encodedId))
+        }
     }
 
     fun navigateToArtWork(
