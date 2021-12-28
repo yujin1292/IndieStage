@@ -20,9 +20,9 @@ sealed class Screen(val route: String) {
     object Stage : Screen("stage/{exhibitionId}") {
         fun createRoute(exhibitionId: String) = "stage/$exhibitionId"
     }
-    object ArtWork : Screen("stage/{exhibitionId}/{artWorkUri}/{mode}/{page}") {
-        fun createRoute(exhibitionId: String, artWorkUri: String, mode: String, page: Int) =
-            "stage/$exhibitionId/$artWorkUri/$mode/$page"
+    object ArtWork : Screen("stage/{exhibitionId}/{artWorkId}/{mode}") {
+        fun createRoute(exhibitionId: String, artWorkId: String, mode: String) =
+            "stage/$exhibitionId/$artWorkId/$mode"
     }
 }
 
@@ -59,22 +59,20 @@ class IndieStageAppState(
 
     fun navigateToArtWork(
         exhibitionId: String,
-        artWorkUri: String,
+        artWorkId: String,
         mode: String,
-        page: Int,
         from: NavBackStackEntry
     ) {
         if (from.lifecycleIsResumed()) {
             val encodedExhibitionId = Uri.encode(exhibitionId)
-            val encodedArtWorkUri = Uri.encode(artWorkUri)
-            val encodedModeUri = Uri.encode(mode)
+            val encodedArtWorkId = Uri.encode(artWorkId)
+            val encodedMode = Uri.encode(mode)
 
             navController.navigate(
                 Screen.ArtWork.createRoute(
                     exhibitionId = encodedExhibitionId,
-                    artWorkUri = encodedArtWorkUri,
-                    mode = encodedModeUri,
-                    page = page
+                    artWorkId = encodedArtWorkId,
+                    mode = encodedMode
                 )
             )
         }

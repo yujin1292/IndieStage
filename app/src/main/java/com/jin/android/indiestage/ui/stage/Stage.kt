@@ -36,7 +36,7 @@ import com.jin.android.indiestage.util.StageViewModelFactory
 @Composable
 fun Stage(
     onBackPress: () -> Unit,
-    navigateToArtWork: (stageUri: String, artWorkUri: String, mode: String, page: Int) -> Unit,
+    navigateToArtWork: (exhibitionId: String, artWorkId: String, mode: String) -> Unit,
     exhibitionId: String,
     viewModel: StageViewModel = viewModel(
         factory = StageViewModelFactory(
@@ -52,7 +52,6 @@ fun Stage(
         }
         is OnSuccess -> {
             exhibitions.querySnapshot?.toObjects(Exhibition::class.java)?.let {
-                //Log.d("stage",it.toString())
                 Box(Modifier.fillMaxSize()) {
                     Image(
                         painter = rememberImagePainter(data = it[0].image),
@@ -68,10 +67,11 @@ fun Stage(
                     Column(modifier = Modifier
                         .fillMaxSize()
                         .padding(15.dp)) {
-                        StageAppBar(viewModel = viewModel, onBackPress = onBackPress)
+                        StageAppBar(title = it[0].title, onBackPress = onBackPress)
                         StageContent(
                             navigateToArtWork = navigateToArtWork,
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            exhibitionId = exhibitionId
                         )
                     }
 
@@ -85,22 +85,22 @@ fun Stage(
 @Composable
 fun StageContent(
     navigateToArtWork: (
-        stageUri: String,
-        artWorkUri: String,
-        mode: String,
-        page: Int
+        exhibitionId: String,
+        artWorkId: String,
+        mode: String
     ) -> Unit,
+    exhibitionId: String,
     viewModel: StageViewModel
 ) {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         StageArtistIntro(viewModel)
-        WorkList(navigateToArtWork, viewModel)
+        WorkList(navigateToArtWork, exhibitionId, viewModel)
     }
 }
 
 @Composable
 fun StageAppBar(
-    viewModel: StageViewModel,
+    title:String,
     onBackPress: () -> Unit
 ) {
     Row(Modifier.fillMaxWidth()) {
@@ -110,7 +110,7 @@ fun StageAppBar(
                 contentDescription = stringResource(R.string.back)
             )
         }
-        Text(modifier = Modifier.align(CenterVertically), text = viewModel.exhibition.title)
+        Text(modifier = Modifier.align(CenterVertically), text = title)
     }
 }
 
@@ -126,9 +126,8 @@ fun StageArtistIntro(
         is ArtistOnSuccess -> {
             artistResponse.querySnapshot?.toObjects(Artist::class.java)?.let {
                 Log.d("stage", it.toString())
-                ArtistInfoScreen(it[0])
+                if(it.size>0) ArtistInfoScreen(it[0])
             }
-
         }
     }
 }
@@ -192,24 +191,24 @@ fun ArtistInfoScreen(artist: Artist) {
 @Composable
 fun WorkList(
     navigateToArtWork: (
-        stageUri: String,
-        artWorkUri: String,
-        mode: String,
-        page: Int
+        exhibitionId: String,
+        artWorkId: String,
+        mode: String
     ) -> Unit,
+    exhibitionId: String,
     viewModel: StageViewModel
 ) {
     when (val artWorkResponse = viewModel.getArtWorkInfo().collectAsState(null).value) {
-        is ArtWorkOnError -> {
+        is ArtWorksOnError -> {
             Log.e("stage", artWorkResponse.exception.toString())
             Text("Error")
         }
-        is ArtWorkOnSuccess -> {
+        is ArtWorksOnSuccess -> {
             artWorkResponse.querySnapshot?.toObjects(ArtWork::class.java)?.let {
-                Column() {
+                Column {
                     LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
                         items(items = it) { work ->
-                            WorkElement(navigateToArtWork = navigateToArtWork, item = work)
+                            WorkElement(navigateToArtWork = navigateToArtWork, item = work, exhibitionId = exhibitionId)
                         }
                     }
                 }
@@ -217,29 +216,28 @@ fun WorkList(
         }
     }
 
-
 }
 
 @Composable
 fun WorkElement(
     navigateToArtWork: (
-        stageUri: String,
-        artWorkUri: String,
-        mode: String,
-        page: Int
+        exhibitionId: String,
+        artWorkId: String,
+        mode: String
     ) -> Unit,
+    exhibitionId: String,
     item: ArtWork
 ) {
     Card(
         modifier = Modifier
-            .clickable { navigateToArtWork("a", "b", "c", 0) }
+            .clickable { navigateToArtWork(exhibitionId, item.id, "auth") } // TODO mode 변경
             .height(300.dp)
             .aspectRatio(0.7f)
             .padding(end = 10.dp)
     ) {
         Box {
             Image(
-                painter = rememberImagePainter(data = item.image[0]),
+                painter = rememberImagePainter(data = item.contents[0].image),
                 contentDescription = "image",
                 modifier = Modifier
                     .padding(5.dp)

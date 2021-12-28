@@ -14,26 +14,19 @@ class StageViewModel(
 
     val exhibitionStateFlow = MutableStateFlow<ExhibitionResponse?>(null)
     val artistStateFlow = MutableStateFlow<ArtistResponse?>(null)
-    val artWorkStateFlow = MutableStateFlow<ArtWorkResponse?>(null)
+    val artWorkStateFlow = MutableStateFlow<ArtWorksResponse?>(null)
     init {
         viewModelScope.launch {
             exhibitionRepo.getExhibitionsById(exhibitionId).collect {
                 exhibitionStateFlow.value = it
             }
 
-            /*exhibitionRepo.getArtist(exhibitionId).collect{
-                artistStateFlow.value = it
-            }*/
         }
     }
 
     fun getExhibitionInfo() = exhibitionRepo.getExhibitions()
     fun getArtistInfo() = exhibitionRepo.getArtist(exhibitionId)
     fun getArtWorkInfo() = exhibitionRepo.getArtWorks(exhibitionId)
-
-    var exhibition = Exhibition()
-    var artistInformation = Artist()
-    var artWorkList = mutableListOf<ArtWork>()
 
 }
 
