@@ -35,7 +35,7 @@ import com.jin.android.indiestage.util.*
 @ExperimentalPagerApi
 @Composable
 fun Home(
-    navigateToTicketBox: (String) -> Unit, //TODO navigateToTicketBox 으로 변경
+    navigateToTicketBox: (String) -> Unit,
     viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(ExhibitionRepo()))
 ) {
     Surface(Modifier.fillMaxSize()) {

@@ -244,7 +244,7 @@ fun WorkElement(
 ) {
     Card(
         modifier = Modifier
-            .clickable { navigateToArtWork(exhibitionId, item.id, mode) } // TODO mode 변경
+            .clickable { navigateToArtWork(exhibitionId, item.id, mode) }
             .height(300.dp)
             .aspectRatio(0.7f)
             .padding(end = 10.dp)

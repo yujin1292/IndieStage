@@ -33,7 +33,6 @@ fun IndieStageApp(
                 )
             }
             composable(Screen.Stage.route) { backStageEntry ->
-
                 backStageEntry.arguments?.getString("exhibitionId")?.let { exhibitionId ->
                     backStageEntry.arguments?.getString("mode")?.let{ mode ->
                         Stage(
@@ -76,6 +75,7 @@ fun IndieStageApp(
             composable(Screen.TicketBox.route) { navBackStackEntry ->
                 navBackStackEntry.arguments?.getString("exhibitionId")?.let {
                     TicketBox(
+                        onBackPress = appState::navigateBack,
                         navigateToStage = { exhibitionId , mode ->
                             appState.navigateToStage(exhibitionId, mode, navBackStackEntry)
                         },

@@ -6,6 +6,7 @@ import com.jin.android.indiestage.data.ExhibitionRepo
 import com.jin.android.indiestage.ui.artwork.ArtWorkViewModel
 import com.jin.android.indiestage.ui.home.HomeViewModel
 import com.jin.android.indiestage.ui.stage.StageViewModel
+import com.jin.android.indiestage.ui.ticketbox.TicketBoxViewModel
 
 class HomeViewModelFactory(private val exhibitionRepo: ExhibitionRepo) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -37,6 +38,18 @@ class ArtWorkViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ArtWorkViewModel::class.java)) {
             return ArtWorkViewModel(exhibitionRepo, exhibitionId, artWorkId) as T
+        }
+        throw IllegalStateException()
+    }
+}
+
+class TicketBoxViewModelFactory(
+    private val exhibitionRepo: ExhibitionRepo,
+    private val exhibitionId: String
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TicketBoxViewModel::class.java)) {
+            return TicketBoxViewModel(exhibitionRepo, exhibitionId) as T
         }
         throw IllegalStateException()
     }
