@@ -22,6 +22,4 @@ class ArtWorkViewModel(
             }
         }
     }
-
-    fun getArtWork() = exhibitionRepo.getArtWork(exhibitionId, artWorkId)
 }

@@ -30,7 +30,9 @@ import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 import com.jin.android.indiestage.util.ArtWorkViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun ArtWorkScreen(

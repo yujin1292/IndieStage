@@ -30,8 +30,10 @@ import com.jin.android.indiestage.data.ExhibitionRepo
 import com.jin.android.indiestage.data.OnError
 import com.jin.android.indiestage.data.OnSuccess
 import com.jin.android.indiestage.util.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
+@ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun Home(

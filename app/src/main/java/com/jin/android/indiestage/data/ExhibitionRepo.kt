@@ -45,7 +45,26 @@ class ExhibitionRepo {
         }
     }
 
-    fun getArtist(id:String) = callbackFlow {
+    fun getExhibitionEnterCode(id: String) = callbackFlow {
+        val collection = fireStore.collection("exhibition")
+            .document(id)
+
+        val snapshotListener = collection.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                EnterCodeOnSuccess(value?.get("enterCode").toString())
+            } else {
+                EnterCodeOnError(error)
+            }
+
+            this.trySend(response).isSuccess
+        }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    fun getArtist(id: String) = callbackFlow {
         val collection = fireStore.collection("exhibition")
             .document(id)
             .collection("artist")
@@ -65,7 +84,7 @@ class ExhibitionRepo {
         }
     }
 
-    fun getArtWorks(id:String) = callbackFlow {
+    fun getArtWorks(id: String) = callbackFlow {
         val collection = fireStore.collection("exhibition")
             .document(id)
             .collection("artwork")
@@ -85,7 +104,7 @@ class ExhibitionRepo {
         }
     }
 
-    fun getArtWork(exhibitionId:String, artWorkId:String) =  callbackFlow {
+    fun getArtWork(exhibitionId: String, artWorkId: String) = callbackFlow {
         val collection = fireStore.collection("exhibition")
             .document(exhibitionId)
             .collection("artwork")

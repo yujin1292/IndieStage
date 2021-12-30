@@ -1,11 +1,11 @@
 package com.jin.android.indiestage.ui.ticketbox
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import android.util.Size
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +23,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Try
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,7 +92,8 @@ fun TicketBox(
                 context = context,
                 lifecycleOwner = lifecycleOwner,
                 navigateToStage = navigateToStage,
-                exhibitionId = exhibitionId
+                exhibitionId = exhibitionId,
+                viewModel = viewModel
             )
         } else {
             IconButton(
@@ -153,14 +153,17 @@ fun TicketBoxAppBar(
     }
 }
 
+@ExperimentalCoroutinesApi
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun QRCodeScanner(
     context: Context,
     lifecycleOwner: LifecycleOwner,
+    viewModel: TicketBoxViewModel,
     navigateToStage: (String, String) -> Unit,
     exhibitionId: String,
 ) {
-    var code by remember { mutableStateOf("scanned data") }
+    var code by remember { mutableStateOf("") }
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     Column {
         AndroidView(
@@ -198,6 +201,7 @@ fun QRCodeScanner(
             },
             modifier = Modifier.weight(1f)
         )
+        //todo : 디버깅용 텍스트 (추후제거)
         Text(
             text = code,
             fontSize = 20.sp,
@@ -206,15 +210,20 @@ fun QRCodeScanner(
                 .fillMaxWidth()
                 .padding(32.dp)
         )
-        // todo:: 비밀번호 매칭시작..
-        if (code == "hello!") {
+
+        if (code != "") {
+            viewModel.checkEnterCode(code)
+        }
+        if (viewModel.startNavigateToStageWithAuth.value) {
             navigateToStage(exhibitionId, "auth")
-        } else {
-            Toast.makeText(
-                context,
-                stringResource(id = R.string.retry_label),
-                Toast.LENGTH_SHORT
-            ).show()
+        }else{
+            if (code != "") {
+                Toast.makeText(
+                    context,
+                    stringResource(id = R.string.retry_label),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 }
