@@ -17,3 +17,8 @@ data class Exhibition (
 sealed class ExhibitionResponse
 data class OnSuccess(val querySnapshot: QuerySnapshot?): ExhibitionResponse()
 data class OnError(val exception: FirebaseFirestoreException?): ExhibitionResponse()
+
+
+sealed class EnterCodeResponse
+data class EnterCodeOnSuccess(val enterCode:String): EnterCodeResponse()
+data class EnterCodeOnError(val exception: FirebaseFirestoreException?): EnterCodeResponse()
