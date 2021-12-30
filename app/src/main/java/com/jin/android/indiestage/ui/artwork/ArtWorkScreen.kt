@@ -29,7 +29,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
-import com.jin.android.indiestage.util.ArtWorkViewModelFactory
+import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -41,11 +41,10 @@ fun ArtWorkScreen(
     artWorkId: String,
     mode: String,
     viewModel: ArtWorkViewModel = viewModel(
-        factory = ArtWorkViewModelFactory(
+        factory = ViewModelFactory(
             exhibitionRepo = ExhibitionRepo(),
             exhibitionId = exhibitionId,
-            artWorkId = artWorkId,
-            mode = mode
+            artWorkId = artWorkId
         )
     )
 ) {

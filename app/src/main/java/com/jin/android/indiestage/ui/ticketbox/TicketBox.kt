@@ -40,7 +40,7 @@ import com.google.accompanist.permissions.*
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.ExhibitionRepo
 import com.jin.android.indiestage.util.QrCodeAnalyzer
-import com.jin.android.indiestage.util.TicketBoxViewModelFactory
+import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -51,7 +51,7 @@ fun TicketBox(
     navigateToStage: (String, String) -> Unit,
     exhibitionId: String,
     viewModel: TicketBoxViewModel = viewModel(
-        factory = TicketBoxViewModelFactory(
+        factory = ViewModelFactory(
             exhibitionRepo = ExhibitionRepo(),
             exhibitionId = exhibitionId
         )

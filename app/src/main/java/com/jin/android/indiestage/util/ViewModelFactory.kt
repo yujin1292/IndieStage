@@ -7,50 +7,29 @@ import com.jin.android.indiestage.ui.artwork.ArtWorkViewModel
 import com.jin.android.indiestage.ui.home.HomeViewModel
 import com.jin.android.indiestage.ui.stage.StageViewModel
 import com.jin.android.indiestage.ui.ticketbox.TicketBoxViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class HomeViewModelFactory(private val exhibitionRepo: ExhibitionRepo) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(exhibitionRepo) as T
-        }
-        throw IllegalStateException()
-    }
-}
-
-class StageViewModelFactory(
+@ExperimentalCoroutinesApi
+class ViewModelFactory(
     private val exhibitionRepo: ExhibitionRepo,
-    private val exhibitionId: String
+    private val exhibitionId: String = "",
+    private val artWorkId: String = ""
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(StageViewModel::class.java)) {
-            return StageViewModel(exhibitionRepo, exhibitionId) as T
+        return when {
+            modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
+                HomeViewModel(exhibitionRepo) as T
+            }
+            modelClass.isAssignableFrom(StageViewModel::class.java) -> {
+                StageViewModel(exhibitionRepo, exhibitionId) as T
+            }
+            modelClass.isAssignableFrom(ArtWorkViewModel::class.java) -> {
+                ArtWorkViewModel(exhibitionRepo, exhibitionId, artWorkId) as T
+            }
+            modelClass.isAssignableFrom(TicketBoxViewModel::class.java) -> {
+                TicketBoxViewModel(exhibitionRepo, exhibitionId) as T
+            }
+            else -> throw IllegalStateException()
         }
-        throw IllegalStateException()
-    }
-}
-
-class ArtWorkViewModelFactory(
-    private val exhibitionRepo: ExhibitionRepo,
-    private val exhibitionId: String,
-    private val artWorkId:String,
-    private val mode:String
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ArtWorkViewModel::class.java)) {
-            return ArtWorkViewModel(exhibitionRepo, exhibitionId, artWorkId) as T
-        }
-        throw IllegalStateException()
-    }
-}
-
-class TicketBoxViewModelFactory(
-    private val exhibitionRepo: ExhibitionRepo,
-    private val exhibitionId: String
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TicketBoxViewModel::class.java)) {
-            return TicketBoxViewModel(exhibitionRepo, exhibitionId) as T
-        }
-        throw IllegalStateException()
     }
 }
