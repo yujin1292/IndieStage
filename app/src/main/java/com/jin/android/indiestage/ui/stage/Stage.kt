@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -48,7 +49,10 @@ fun Stage(
         )
     )
 ) {
-    when (val exhibitions = viewModel.exhibitionStateFlow.collectAsState().value) {
+
+    val viewState by viewModel.state.collectAsState()
+
+    when (val exhibitions = viewState.exhibitionFlow) {
         is OnError -> {
             Log.e("stage", exhibitions.exception.toString())
             Text("Error")
@@ -75,8 +79,9 @@ fun Stage(
                         StageAppBar(title = it[0].title, onBackPress = onBackPress)
                         StageContent(
                             navigateToArtWork = navigateToArtWork,
-                            viewModel = viewModel,
                             exhibitionId = exhibitionId,
+                            artistResponse = viewState.artistInfoFlow,
+                            artWorksResponse = viewState.artWorkInfoFlow,
                             mode = mode
                         )
                     }
@@ -95,13 +100,14 @@ fun StageContent(
         artWorkId: String,
         mode: String
     ) -> Unit,
+    artistResponse : ArtistResponse,
+    artWorksResponse :ArtWorksResponse,
     exhibitionId: String,
-    mode:String,
-    viewModel: StageViewModel
+    mode:String
 ) {
     Column(Modifier.verticalScroll(rememberScrollState())) {
-        StageArtistIntro(viewModel)
-        WorkList(navigateToArtWork, exhibitionId, mode,viewModel)
+        StageArtistIntro(artistResponse)
+        WorkList(navigateToArtWork, exhibitionId, mode,artWorksResponse)
     }
 }
 
@@ -123,9 +129,9 @@ fun StageAppBar(
 
 @Composable
 fun StageArtistIntro(
-    viewModel: StageViewModel
+    artistResponse : ArtistResponse,
 ) {
-    when (val artistResponse = viewModel.getArtistInfo().collectAsState(null).value) {
+    when (artistResponse) {
         is ArtistOnError -> {
             Log.e("stage", artistResponse.exception.toString())
             Text("Error")
@@ -204,15 +210,15 @@ fun WorkList(
     ) -> Unit,
     exhibitionId: String,
     mode:String,
-    viewModel: StageViewModel
+    artWorksResponse :ArtWorksResponse,
 ) {
-    when (val artWorkResponse = viewModel.getArtWorkInfo().collectAsState(null).value) {
+    when ( artWorksResponse) {
         is ArtWorksOnError -> {
-            Log.e("stage", artWorkResponse.exception.toString())
+            Log.e("stage", artWorksResponse.exception.toString())
             Text("Error")
         }
         is ArtWorksOnSuccess -> {
-            artWorkResponse.querySnapshot?.toObjects(ArtWork::class.java)?.let {
+            artWorksResponse.querySnapshot?.toObjects(ArtWork::class.java)?.let {
                 Column {
                     LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
                         items(items = it) { work ->
