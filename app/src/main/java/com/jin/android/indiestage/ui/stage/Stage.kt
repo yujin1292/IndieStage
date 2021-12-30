@@ -31,7 +31,7 @@ import coil.compose.rememberImagePainter
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
-import com.jin.android.indiestage.util.StageViewModelFactory
+import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -42,7 +42,7 @@ fun Stage(
     exhibitionId: String,
     mode: String,
     viewModel: StageViewModel = viewModel(
-        factory = StageViewModelFactory(
+        factory = ViewModelFactory(
             exhibitionRepo = ExhibitionRepo(),
             exhibitionId = exhibitionId
         )

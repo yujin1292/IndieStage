@@ -38,7 +38,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun Home(
     navigateToTicketBox: (String) -> Unit,
-    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(ExhibitionRepo()))
+    viewModel: HomeViewModel = viewModel(factory = ViewModelFactory(ExhibitionRepo()))
 ) {
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
