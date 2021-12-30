@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.ExhibitionRepo
 import com.jin.android.indiestage.data.ExhibitionResponse
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 
+@ExperimentalCoroutinesApi
 class HomeViewModel(
     private val exhibitionRepo: ExhibitionRepo
 ) : ViewModel() {
@@ -20,6 +22,4 @@ class HomeViewModel(
             }
         }
     }
-
-    fun getExhibitionInfo() = exhibitionRepo.getExhibitions()
 }

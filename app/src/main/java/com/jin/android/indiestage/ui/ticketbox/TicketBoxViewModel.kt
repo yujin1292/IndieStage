@@ -38,7 +38,6 @@ class TicketBoxViewModel(
         }
     }
 
-
     fun checkEnterCode(inputCode: String) {
         val sha = try {
             val sh: MessageDigest = MessageDigest.getInstance("SHA-256")
