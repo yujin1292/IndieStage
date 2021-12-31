@@ -16,15 +16,22 @@ import androidx.navigation.compose.rememberNavController
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
-    object TicketBox : Screen("ticketBox/{exhibitionId}"){
+    object TicketBox : Screen("ticketBox/{exhibitionId}") {
         fun createRoute(exhibitionId: String) = "ticketBox/$exhibitionId"
     }
+
     object Stage : Screen("stage/{exhibitionId}/{mode}") {
-        fun createRoute(exhibitionId: String, mode:String) = "stage/$exhibitionId/$mode"
+        fun createRoute(exhibitionId: String, mode: String) = "stage/$exhibitionId/$mode"
     }
-    object ArtWork : Screen("stage/{exhibitionId}/{artWorkId}/{mode}") {
-        fun createRoute(exhibitionId: String, artWorkId: String, mode: String) =
-            "stage/$exhibitionId/$artWorkId/$mode"
+
+    object ArtWorkAsGuest : Screen("stage/{exhibitionId}/{artWorkId}/guest") {
+        fun createRoute(exhibitionId: String, artWorkId: String) =
+            "stage/$exhibitionId/$artWorkId/guest"
+    }
+
+    object ArtWork : Screen("stage/{exhibitionId}/{artWorkId}/auth") {
+        fun createRoute(exhibitionId: String, artWorkId: String) =
+            "stage/$exhibitionId/$artWorkId/auth"
     }
 }
 
@@ -47,7 +54,7 @@ class IndieStageAppState(
         isOnline = checkIfOnline()
     }
 
-    fun navigateToStage(exhibitionId: String, mode:String, from: NavBackStackEntry) {
+    fun navigateToStage(exhibitionId: String, mode: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
             navController.popBackStack()
@@ -57,7 +64,7 @@ class IndieStageAppState(
         }
     }
 
-    fun navigateToTicketBox(exhibitionId: String, from: NavBackStackEntry){
+    fun navigateToTicketBox(exhibitionId: String, from: NavBackStackEntry) {
         if (from.lifecycleIsResumed()) {
             val encodedId = Uri.encode(exhibitionId)
             navController.navigate(Screen.TicketBox.createRoute(encodedId))
@@ -73,15 +80,25 @@ class IndieStageAppState(
         if (from.lifecycleIsResumed()) {
             val encodedExhibitionId = Uri.encode(exhibitionId)
             val encodedArtWorkId = Uri.encode(artWorkId)
-            val encodedMode = Uri.encode(mode)
+            when (mode) {
+                "auth" -> {
+                    navController.navigate(
+                        Screen.ArtWork.createRoute(
+                            exhibitionId = encodedExhibitionId,
+                            artWorkId = encodedArtWorkId,
+                        )
+                    )
+                }
+                "guest" -> {
+                    navController.navigate(
+                        Screen.ArtWorkAsGuest.createRoute(
+                            exhibitionId = encodedExhibitionId,
+                            artWorkId = encodedArtWorkId
+                        )
+                    )
+                }
+            }
 
-            navController.navigate(
-                Screen.ArtWork.createRoute(
-                    exhibitionId = encodedExhibitionId,
-                    artWorkId = encodedArtWorkId,
-                    mode = encodedMode
-                )
-            )
         }
     }
 
