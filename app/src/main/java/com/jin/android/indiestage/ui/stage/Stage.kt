@@ -39,9 +39,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun Stage(
     onBackPress: () -> Unit,
-    navigateToArtWork: (exhibitionId: String, artWorkId: String, mode: String) -> Unit,
+    navigateToArtWork: (exhibitionId: String, artWorkId: String) -> Unit,
     exhibitionId: String,
-    mode: String,
     viewModel: StageViewModel = viewModel(
         factory = ViewModelFactory(
             exhibitionRepo = ExhibitionRepo(),
@@ -81,8 +80,7 @@ fun Stage(
                             navigateToArtWork = navigateToArtWork,
                             exhibitionId = exhibitionId,
                             artistResponse = viewState.artistInfoFlow,
-                            artWorksResponse = viewState.artWorkInfoFlow,
-                            mode = mode
+                            artWorksResponse = viewState.artWorkInfoFlow
                         )
                     }
 
@@ -97,17 +95,15 @@ fun Stage(
 fun StageContent(
     navigateToArtWork: (
         exhibitionId: String,
-        artWorkId: String,
-        mode: String
+        artWorkId: String
     ) -> Unit,
     artistResponse : ArtistResponse,
     artWorksResponse :ArtWorksResponse,
-    exhibitionId: String,
-    mode:String
+    exhibitionId: String
 ) {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         StageArtistIntro(artistResponse)
-        WorkList(navigateToArtWork, exhibitionId, mode,artWorksResponse)
+        WorkList(navigateToArtWork, exhibitionId,artWorksResponse)
     }
 }
 
@@ -205,11 +201,9 @@ fun ArtistInfoScreen(artist: Artist) {
 fun WorkList(
     navigateToArtWork: (
         exhibitionId: String,
-        artWorkId: String,
-        mode: String
+        artWorkId: String
     ) -> Unit,
     exhibitionId: String,
-    mode:String,
     artWorksResponse :ArtWorksResponse,
 ) {
     when ( artWorksResponse) {
@@ -225,8 +219,7 @@ fun WorkList(
                             WorkElement(
                                 navigateToArtWork = navigateToArtWork,
                                 item = work,
-                                exhibitionId = exhibitionId,
-                                mode = mode
+                                exhibitionId = exhibitionId
                             )
                         }
                     }
@@ -241,16 +234,14 @@ fun WorkList(
 fun WorkElement(
     navigateToArtWork: (
         exhibitionId: String,
-        artWorkId: String,
-        mode: String
+        artWorkId: String
     ) -> Unit,
     exhibitionId: String,
-    mode: String,
     item: ArtWork
 ) {
     Card(
         modifier = Modifier
-            .clickable { navigateToArtWork(exhibitionId, item.id, mode) }
+            .clickable { navigateToArtWork(exhibitionId, item.id) }
             .height(300.dp)
             .aspectRatio(0.7f)
             .padding(end = 10.dp)

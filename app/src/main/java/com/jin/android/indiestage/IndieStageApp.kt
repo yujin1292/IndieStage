@@ -13,7 +13,9 @@ import com.jin.android.indiestage.ui.artwork.ArtWorkScreen
 import com.jin.android.indiestage.ui.home.Home
 import com.jin.android.indiestage.ui.stage.Stage
 import com.jin.android.indiestage.ui.ticketbox.TicketBox
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ExperimentalPermissionsApi
 @ExperimentalPagerApi
 @Composable
@@ -34,12 +36,11 @@ fun IndieStageApp(
             }
             composable(Screen.Stage.route) { backStageEntry ->
                 backStageEntry.arguments?.getString("exhibitionId")?.let { exhibitionId ->
-                    backStageEntry.arguments?.getString("mode")?.let{ mode ->
+                    backStageEntry.arguments?.getString("mode")?.let { mode ->
                         Stage(
                             onBackPress = appState::navigateBack,
                             exhibitionId = exhibitionId,
-                            mode = mode,
-                            navigateToArtWork = { exhibitionId, artWorkId, mode ->
+                            navigateToArtWork = { exhibitionId, artWorkId ->
                                 appState.navigateToArtWork(
                                     exhibitionId = exhibitionId,
                                     artWorkId = artWorkId,
@@ -76,7 +77,7 @@ fun IndieStageApp(
                 navBackStackEntry.arguments?.getString("exhibitionId")?.let {
                     TicketBox(
                         onBackPress = appState::navigateBack,
-                        navigateToStage = { exhibitionId , mode ->
+                        navigateToStage = { exhibitionId, mode ->
                             appState.navigateToStage(exhibitionId, mode, navBackStackEntry)
                         },
                         exhibitionId = it

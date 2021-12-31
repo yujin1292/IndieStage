@@ -199,7 +199,7 @@ fun QRCodeScanner(
                 }
                 previewView
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
         )
         //todo : 디버깅용 텍스트 (추후제거)
         Text(
