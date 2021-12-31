@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreen
+import com.jin.android.indiestage.ui.artwork.ArtWorkScreenAsGuest
 import com.jin.android.indiestage.ui.home.Home
 import com.jin.android.indiestage.ui.stage.Stage
 import com.jin.android.indiestage.ui.ticketbox.TicketBox
@@ -54,25 +55,6 @@ fun IndieStageApp(
 
                 }
             }
-            composable(Screen.ArtWork.route) { backStageEntry ->
-
-                val exhibitionId: String = backStageEntry.arguments?.getString("exhibitionId").run {
-                    this ?: "null"
-                }
-                val artWorkId: String = backStageEntry.arguments?.getString("artWorkId").run {
-                    this ?: "null"
-                }
-                val mode: String = backStageEntry.arguments?.getString("mode").run {
-                    this ?: "null"
-                }
-
-                ArtWorkScreen(
-                    onBackPress = appState::navigateBack,
-                    exhibitionId = exhibitionId,
-                    artWorkId = artWorkId,
-                    mode = mode
-                )
-            }
             composable(Screen.TicketBox.route) { navBackStackEntry ->
                 navBackStackEntry.arguments?.getString("exhibitionId")?.let {
                     TicketBox(
@@ -83,6 +65,37 @@ fun IndieStageApp(
                         exhibitionId = it
                     )
                 }
+            }
+            composable(Screen.ArtWork.route) { backStageEntry ->
+
+                val exhibitionId: String = backStageEntry.arguments?.getString("exhibitionId").run {
+                    this ?: "null"
+                }
+                val artWorkId: String = backStageEntry.arguments?.getString("artWorkId").run {
+                    this ?: "null"
+                }
+
+                ArtWorkScreen(
+                    onBackPress = appState::navigateBack,
+                    exhibitionId = exhibitionId,
+                    artWorkId = artWorkId
+                )
+
+            }
+            composable(Screen.ArtWorkAsGuest.route) { backStageEntry ->
+
+                val exhibitionId: String = backStageEntry.arguments?.getString("exhibitionId").run {
+                    this ?: "null"
+                }
+                val artWorkId: String = backStageEntry.arguments?.getString("artWorkId").run {
+                    this ?: "null"
+                }
+
+                ArtWorkScreenAsGuest(
+                    onBackPress = appState::navigateBack,
+                    exhibitionId = exhibitionId,
+                    artWorkId = artWorkId
+                )
             }
         }
     } else {
