@@ -16,18 +16,17 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -86,7 +85,8 @@ fun TicketBox(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TicketBoxAppBar(title = "TicketBox", onBackPress = onBackPress)
+        TicketBoxAppBar(title = "TicketBox", onBackPress = onBackPress, navigateToStage, exhibitionId)
+
         if (hasCamPermission) {
             QRCodeScanner(
                 context = context,
@@ -119,38 +119,38 @@ fun TicketBox(
                 }
             }
         }
-
-
-        // todo :: Guest 버튼 외 삭제
-        Button(
-            onClick = { navigateToStage(exhibitionId, "guest") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Enter as a Guest")
-        }
-        Button(
-            onClick = { navigateToStage(exhibitionId, "auth") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Enter as a Auth")
-        }
     }
 }
 
 @Composable
 fun TicketBoxAppBar(
     title: String,
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    navigateToStage: (String, String) -> Unit,
+    exhibitionId: String
 ) {
-    Row {
-        IconButton(onClick = onBackPress) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = stringResource(R.string.back)
-            )
+    TopAppBar(
+        title = {
+            Row {
+                IconButton(onClick = onBackPress) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(modifier = Modifier.align(Alignment.CenterVertically), text = title)
+            }
+        },
+        actions = {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Button(
+                    onClick = {navigateToStage(exhibitionId, "guest") }
+                ) {
+                    Text("둘러보기")
+                }
+            }
         }
-        Text(modifier = Modifier.align(Alignment.CenterVertically), text = title)
-    }
+    )
 }
 
 @ExperimentalCoroutinesApi
@@ -199,18 +199,8 @@ fun QRCodeScanner(
                 }
                 previewView
             },
-            modifier = Modifier
+            modifier = Modifier.fillMaxSize()
         )
-        //todo : 디버깅용 텍스트 (추후제거)
-        Text(
-            text = code,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp)
-        )
-
         if (code != "") {
             viewModel.checkEnterCode(code)
         }

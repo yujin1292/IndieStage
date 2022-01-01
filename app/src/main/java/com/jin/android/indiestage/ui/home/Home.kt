@@ -13,11 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -31,7 +32,8 @@ import com.jin.android.indiestage.data.OnError
 import com.jin.android.indiestage.data.OnSuccess
 import com.jin.android.indiestage.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import kotlin.math.absoluteValue
 
 @ExperimentalCoroutinesApi
 @ExperimentalPagerApi
@@ -49,6 +51,7 @@ fun Home(
     }
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun HomeContent(
@@ -112,17 +115,41 @@ fun HomeContent(
                                 HorizontalPager(
                                     count = it.size,
                                     state = pagerState,
+                                    contentPadding = PaddingValues(horizontal = 32.dp),
                                     modifier = modifier
                                 ) { page ->
-                                    PosterItem(
-                                        onClick = navigateToTicketBox,
-                                        item = it[page],
-                                        modifier = Modifier
-                                            .padding(4.dp)
-                                            .fillMaxHeight()
-                                    )
+                                    Card(Modifier
+                                        .graphicsLayer {
+                                            // Calculate the absolute offset for the current page from the
+                                            // scroll position. We use the absolute value which allows us to mirror
+                                            // any effects for both directions
+                                            val pageOffset =
+                                                calculateCurrentOffsetForPage(page).absoluteValue
+
+                                            // We animate the scaleX + scaleY, between 85% and 100%
+                                            lerp(
+                                                start = 0.85f,
+                                                stop = 1f,
+                                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                            ).also { scale ->
+                                                scaleX = scale
+                                                scaleY = scale
+                                            }
+                                            // We animate the alpha, between 50% and 100%
+                                            alpha = lerp(
+                                                start = 0.5f,
+                                                stop = 1f,
+                                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                            )
+                                        }) {
+                                        PosterItem(
+                                            onClick = navigateToTicketBox,
+                                            item = it[page],
+                                            modifier = Modifier
+                                        )
+                                    }
+
                                 }
-                                Spacer(Modifier.height(16.dp))
                             }
                         }
                     }
@@ -173,48 +200,40 @@ private fun PosterItem(
     item: Exhibition
 ) {
     var expanded by remember { mutableStateOf(false) }
-
-    Column(
-        modifier
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+    Box(
+        Modifier
+            .aspectRatio(0.7f)
+            .clickable(onClick = { expanded = !expanded })
     ) {
-        Box(
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterHorizontally)
-                .aspectRatio(0.7f)
-                .clickable(onClick = { expanded = !expanded })
-        ) {
-            Image(
-                painter = rememberImagePainter(data = item.image),
-                contentDescription = item.title,
-                contentScale = ContentScale.Crop,
+        Image(
+            painter = rememberImagePainter(data = item.image),
+            contentDescription = item.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(MaterialTheme.shapes.medium),
+        )
+
+        if (expanded) {
+            Surface(
+                color = colorResource(id = R.color.shadow50),
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(MaterialTheme.shapes.medium),
-            )
-
-            if (expanded) {
-                Surface(
-                    color = colorResource(id = R.color.shadow50),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Button(
-                            onClick = { onClick(item.id) },
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text("전시 입장")
-                        }
+                    .align(Alignment.Center)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Button(
+                        onClick = { onClick(item.id) },
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text("전시 입장")
                     }
-
                 }
 
             }
+
         }
     }
 }
