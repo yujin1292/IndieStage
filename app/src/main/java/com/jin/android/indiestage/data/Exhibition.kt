@@ -5,13 +5,14 @@ import com.google.firebase.firestore.QuerySnapshot
 
 data class Exhibition (
     val id : String,
+    val isOpened:Boolean,
     val title: String,
     val image: String,
     val description:String,
     val artist:Artist,
     val artwork:ArtWork
 ){
-    constructor():this("","","","",Artist(),ArtWork())
+    constructor():this("", true,"","","",Artist(),ArtWork())
 }
 
 sealed class ExhibitionResponse

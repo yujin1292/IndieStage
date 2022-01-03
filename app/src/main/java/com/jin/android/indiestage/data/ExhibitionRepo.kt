@@ -9,8 +9,42 @@ import kotlinx.coroutines.flow.callbackFlow
 class ExhibitionRepo {
     private val fireStore = FirebaseFirestore.getInstance()
 
-    fun getExhibitions() = callbackFlow {
+    fun getAllExhibitions() = callbackFlow {
         val collection = fireStore.collection("exhibition")
+        val snapshotListener = collection.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                OnSuccess(value)
+            } else {
+                OnError(error)
+            }
+
+            this.trySend(response).isSuccess
+        }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    fun getOpenedExhibitions() = callbackFlow {
+        val collection = fireStore.collection("exhibition").whereEqualTo("isOpened",true)
+        val snapshotListener = collection.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                OnSuccess(value)
+            } else {
+                OnError(error)
+            }
+
+            this.trySend(response).isSuccess
+        }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    fun getClosedExhibitions() = callbackFlow {
+        val collection = fireStore.collection("exhibition").whereEqualTo("isOpened",false)
         val snapshotListener = collection.addSnapshotListener { value, error ->
             val response = if (error == null) {
                 OnSuccess(value)
