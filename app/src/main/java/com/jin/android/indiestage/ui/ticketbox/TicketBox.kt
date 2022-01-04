@@ -20,17 +20,12 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -38,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.*
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.ExhibitionRepo
+import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
 import com.jin.android.indiestage.util.QrCodeAnalyzer
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,8 +45,10 @@ fun TicketBox(
     onBackPress: () -> Unit,
     navigateToStage: (String, String) -> Unit,
     exhibitionId: String,
+    checkedInDataSource: CheckedInDataSource,
     viewModel: TicketBoxViewModel = viewModel(
         factory = ViewModelFactory(
+            checkedInDataSource = checkedInDataSource,
             exhibitionRepo = ExhibitionRepo(),
             exhibitionId = exhibitionId
         )
@@ -85,7 +83,12 @@ fun TicketBox(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TicketBoxAppBar(title = "TicketBox", onBackPress = onBackPress, navigateToStage, exhibitionId)
+        TicketBoxAppBar(
+            title = "TicketBox",
+            onBackPress = onBackPress,
+            navigateToStage,
+            exhibitionId
+        )
 
         if (hasCamPermission) {
             QRCodeScanner(
@@ -144,7 +147,7 @@ fun TicketBoxAppBar(
         actions = {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Button(
-                    onClick = {navigateToStage(exhibitionId, "guest") }
+                    onClick = { navigateToStage(exhibitionId, "guest") }
                 ) {
                     Text("둘러보기")
                 }
@@ -202,11 +205,17 @@ fun QRCodeScanner(
             modifier = Modifier.fillMaxSize()
         )
         if (code != "") {
-            viewModel.checkEnterCode(code)
+            viewModel.verifyEnterCode(code)
         }
-        if (viewModel.startNavigateToStageWithAuth.value) {
+        val start by viewModel.startNavigateToStageWithAuth.collectAsState()
+        if (start) {
             navigateToStage(exhibitionId, "auth")
-        }else{
+            Toast.makeText(
+                context,
+                "인증되었습니다",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
             if (code != "") {
                 Toast.makeText(
                     context,

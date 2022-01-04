@@ -1,16 +1,20 @@
 package com.jin.android.indiestage.ui.home
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.*
-import com.jin.android.indiestage.ui.home.explore.TabItem
+import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
+import com.jin.android.indiestage.data.checkedin.CheckedInEntity
+import com.jin.android.indiestage.data.checkedin.CheckedInRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 class HomeViewModel(
-    private val exhibitionRepo: ExhibitionRepo
+    private val exhibitionRepo: ExhibitionRepo,
+    private val checkedInDataSource: CheckedInDataSource?
 ) : ViewModel() {
 
     private lateinit var openedExhibitionFlow: Flow<ExhibitionResponse>
@@ -22,6 +26,8 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeViewState())
     val state: StateFlow<HomeViewState>
         get() = _state
+
+    val checkedInList = checkedInDataSource!!.getAllData()
 
     init {
         viewModelScope.launch {
@@ -56,7 +62,6 @@ class HomeViewModel(
     }
 
 }
-
 enum class HomeCategory {
     Exhibition, CheckedIn
 }

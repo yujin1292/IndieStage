@@ -13,10 +13,11 @@ class MainActivity : ComponentActivity() {
     @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val indieStageApplication: IndieStage = application as IndieStage
         setContent {
             IndieStageTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    IndieStageApp()
+                    IndieStageApp(indieStageApplication)
                 }
             }
         }

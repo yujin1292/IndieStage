@@ -1,5 +1,6 @@
 package com.jin.android.indiestage
 
+import android.app.Application
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -21,7 +22,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun IndieStageApp(
+    application: IndieStage,
     appState: IndieStageAppState = rememberIndieStageAppState()
+
 ) {
     if (appState.isOnline) {
         NavHost(
@@ -30,6 +33,7 @@ fun IndieStageApp(
         ) {
             composable(Screen.Home.route) { backStackEntry ->
                 Home(
+                    checkedInDataSource = application.checkedInDataSource,
                     navigateToTicketBox = { exhibitionId ->
                         appState.navigateToTicketBox(exhibitionId, backStackEntry)
                     }
@@ -62,7 +66,8 @@ fun IndieStageApp(
                         navigateToStage = { exhibitionId, mode ->
                             appState.navigateToStage(exhibitionId, mode, navBackStackEntry)
                         },
-                        exhibitionId = it
+                        exhibitionId = it,
+                        checkedInDataSource = application.checkedInDataSource,
                     )
                 }
             }

@@ -1,5 +1,6 @@
 package com.jin.android.indiestage.ui.home
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -19,6 +20,9 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.jin.android.indiestage.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jin.android.indiestage.data.*
+import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
+import com.jin.android.indiestage.data.checkedin.CheckedInRepository
+import com.jin.android.indiestage.ui.home.checkedin.CheckedInScreen
 import com.jin.android.indiestage.ui.home.explore.ExploreScreen
 import com.jin.android.indiestage.ui.home.explore.TabItem
 import com.jin.android.indiestage.util.*
@@ -29,12 +33,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun Home(
     navigateToTicketBox: (String) -> Unit,
-    viewModel: HomeViewModel = viewModel(factory = ViewModelFactory(ExhibitionRepo()))
+    checkedInDataSource: CheckedInDataSource,
+    viewModel: HomeViewModel = viewModel(
+        factory = ViewModelFactory(
+            checkedInDataSource,
+            ExhibitionRepo()
+        )
+    )
 ) {
-    val viewState by viewModel.state.collectAsState()
+    val homeViewState by viewModel.state.collectAsState()
 
     val tabItemList = mutableListOf<TabItem>()
-    when (val opened = viewState.openedExhibitionFlow) {
+    when (val opened = homeViewState.openedExhibitionFlow) {
         is OnSuccess -> {
             opened.querySnapshot?.toObjects(Exhibition::class.java)?.let {
                 tabItemList.add(TabItem(
@@ -50,7 +60,7 @@ fun Home(
             opened.exception?.printStackTrace()
         }
     }
-    when (val closed = viewState.closedExhibitionFlow) {
+    when (val closed = homeViewState.closedExhibitionFlow) {
         is OnSuccess -> {
             closed.querySnapshot?.toObjects(Exhibition::class.java)?.let {
                 tabItemList.add(TabItem(
@@ -69,8 +79,9 @@ fun Home(
 
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
+            viewModel = viewModel,
             tabItemList = tabItemList,
-            selectedHomeCategory = viewState.selectedHomeCategory,
+            selectedHomeCategory = homeViewState.selectedHomeCategory,
             onCategorySelected = viewModel::onHomeCategorySelected,
         )
     }
@@ -80,6 +91,7 @@ fun Home(
 @ExperimentalPagerApi
 @Composable
 fun HomeContent(
+    viewModel: HomeViewModel,
     tabItemList: List<TabItem>,
     selectedHomeCategory: HomeCategory,
     onCategorySelected: (HomeCategory) -> Unit,
@@ -101,7 +113,7 @@ fun HomeContent(
                         ExploreScreen(tabItemList = tabItemList)
                     }
                     HomeCategory.CheckedIn -> {
-                        CheckedInTab()
+                        CheckedInScreen(viewModel)
                     }
                 }
             }
