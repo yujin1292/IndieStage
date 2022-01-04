@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
+    object QuickEnter : Screen("quickEnter")
     object TicketBox : Screen("ticketBox/{exhibitionId}") {
         fun createRoute(exhibitionId: String) = "ticketBox/$exhibitionId"
     }
@@ -68,6 +69,12 @@ class IndieStageAppState(
         if (from.lifecycleIsResumed()) {
             val encodedId = Uri.encode(exhibitionId)
             navController.navigate(Screen.TicketBox.createRoute(encodedId))
+        }
+    }
+
+    fun navigateToQuickEnter(from: NavBackStackEntry) {
+        if (from.lifecycleIsResumed()) {
+            navController.navigate(Screen.QuickEnter.route)
         }
     }
 

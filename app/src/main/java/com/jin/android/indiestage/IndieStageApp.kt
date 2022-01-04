@@ -13,6 +13,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreen
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreenAsGuest
 import com.jin.android.indiestage.ui.home.Home
+import com.jin.android.indiestage.ui.quickenter.QuickEnterScreen
 import com.jin.android.indiestage.ui.stage.Stage
 import com.jin.android.indiestage.ui.ticketbox.TicketBox
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +37,17 @@ fun IndieStageApp(
                     checkedInDataSource = application.checkedInDataSource,
                     navigateToTicketBox = { exhibitionId ->
                         appState.navigateToTicketBox(exhibitionId, backStackEntry)
-                    }
+                    },
+                    navigateToQuickEnter = {appState.navigateToQuickEnter(backStackEntry)}
+                )
+            }
+            composable(Screen.QuickEnter.route){ navBackStackEntry->
+                QuickEnterScreen(
+                    onBackPress = appState::navigateBack,
+                    navigateToStage = { exhibitionId, mode ->
+                        appState.navigateToStage(exhibitionId, mode, navBackStackEntry)
+                    },
+                    checkedInDataSource = application.checkedInDataSource,
                 )
             }
             composable(Screen.Stage.route) { backStageEntry ->

@@ -10,9 +10,10 @@ data class Exhibition (
     val image: String,
     val description:String,
     val artist:Artist,
-    val artwork:ArtWork
+    val artwork:ArtWork,
+    val enterCode: String
 ){
-    constructor():this("", true,"","","",Artist(),ArtWork())
+    constructor():this("", true,"","","",Artist(),ArtWork(),"")
 }
 
 sealed class ExhibitionResponse

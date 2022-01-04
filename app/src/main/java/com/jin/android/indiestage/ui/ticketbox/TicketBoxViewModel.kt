@@ -3,12 +3,10 @@ package com.jin.android.indiestage.ui.ticketbox
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jin.android.indiestage.data.EnterCodeOnSuccess
-import com.jin.android.indiestage.data.Exhibition
-import com.jin.android.indiestage.data.ExhibitionRepo
-import com.jin.android.indiestage.data.OnSuccess
+import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
 import com.jin.android.indiestage.data.checkedin.CheckedInEntity
+import com.jin.android.indiestage.ui.ticketbox.TicketBoxState.*
 import com.jin.android.indiestage.util.EnterCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +19,7 @@ class TicketBoxViewModel(
     private val exhibitionRepo: ExhibitionRepo,
     private val exhibitionId: String,
 ) : ViewModel() {
-    val startNavigateToStageWithAuth: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val state: MutableStateFlow<TicketBoxState> = MutableStateFlow(InitialState)
 
     private var enterCode: String = ""
     private var exhibition: Exhibition = Exhibition()
@@ -61,15 +59,27 @@ class TicketBoxViewModel(
         }
     }
 
-    fun verifyEnterCode(inputCode: String) {
+    fun verifyEnterCode(msg:QRMessage) {
+        if(msg.id != exhibitionId){
+            state.value = WrongId
+            return
+        }
         viewModelScope.launch {
-            val startNavigate = EnterCode.verifyEnterCode(inputCode, enterCode)
-
-            startNavigateToStageWithAuth.value = startNavigate
-            if (startNavigate) {
+            val isMatched = EnterCode.verifyEnterCode(msg.enterCode, enterCode)
+            if (isMatched) {
                 checkedInDataSource?.checkIn(CheckedInEntity(exhibition))
+                state.value = StartNavigation
+            }else{
+                state.value = WrongEnterCode
             }
         }
     }
 
+}
+
+sealed class TicketBoxState{
+    object InitialState:TicketBoxState()
+    object StartNavigation:TicketBoxState()
+    object WrongEnterCode: TicketBoxState()
+    object WrongId:TicketBoxState()
 }

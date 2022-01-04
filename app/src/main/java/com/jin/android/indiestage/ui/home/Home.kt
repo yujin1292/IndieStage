@@ -31,6 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun Home(
     navigateToTicketBox: (String) -> Unit,
+    navigateToQuickEnter: ()->Unit,
     checkedInDataSource: CheckedInDataSource,
     viewModel: HomeViewModel = viewModel(
         factory = ViewModelFactory(
@@ -81,6 +82,7 @@ fun Home(
             tabItemList = tabItemList,
             selectedHomeCategory = homeViewState.selectedHomeCategory,
             onCategorySelected = viewModel::onHomeCategorySelected,
+            navigateToQuickEnter = navigateToQuickEnter
         )
     }
 }
@@ -93,6 +95,7 @@ fun HomeContent(
     tabItemList: List<TabItem>,
     selectedHomeCategory: HomeCategory,
     onCategorySelected: (HomeCategory) -> Unit,
+    navigateToQuickEnter: ()->Unit,
 ) {
     val fabShape = RoundedCornerShape(50)
     Scaffold(
@@ -116,7 +119,7 @@ fun HomeContent(
                 }
             }
         },
-        floatingActionButton = { HomeFabButton(fabShape = fabShape) },
+        floatingActionButton = { HomeFabButton(fabShape = fabShape, onClick = navigateToQuickEnter) },
         isFloatingActionButtonDocked = true,
         floatingActionButtonPosition = FabPosition.Center,
         bottomBar = {
@@ -201,10 +204,11 @@ fun HomeBottomAppBar(
 
 @Composable
 fun HomeFabButton(
-    fabShape: Shape
+    fabShape: Shape,
+    onClick: ()->Unit
 ) {
     FloatingActionButton(
-        onClick = { /* TODO */ },
+        onClick = { onClick() },
         shape = fabShape,
     ) {
         Icon(Icons.Filled.Camera, "")

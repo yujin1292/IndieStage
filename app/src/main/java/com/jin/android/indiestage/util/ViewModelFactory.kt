@@ -7,6 +7,7 @@ import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
 import com.jin.android.indiestage.data.checkedin.CheckedInRepository
 import com.jin.android.indiestage.ui.artwork.ArtWorkViewModel
 import com.jin.android.indiestage.ui.home.HomeViewModel
+import com.jin.android.indiestage.ui.quickenter.QuickEnterViewModel
 import com.jin.android.indiestage.ui.stage.StageViewModel
 import com.jin.android.indiestage.ui.ticketbox.TicketBoxViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +32,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(TicketBoxViewModel::class.java) -> {
                 TicketBoxViewModel(checkedInDataSource,exhibitionRepo, exhibitionId) as T
+            }
+            modelClass.isAssignableFrom(QuickEnterViewModel::class.java) -> {
+                QuickEnterViewModel(checkedInDataSource,exhibitionRepo) as T
             }
             else -> throw IllegalStateException()
         }
