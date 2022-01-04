@@ -7,4 +7,6 @@
     <string name="back">back</string>
     <string name="history" translatable="false">History</string>
     <string name="contact" translatable="false">Contact</string>
+    <string name="exhibition_tab">Exhibitions</string>
+    <string name="checked_in_tab">Checked In</string>
 </resources>

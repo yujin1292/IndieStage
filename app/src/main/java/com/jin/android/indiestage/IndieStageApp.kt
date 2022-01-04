@@ -1,5 +1,6 @@
 package com.jin.android.indiestage
 
+import android.app.Application
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -12,6 +13,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreen
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreenAsGuest
 import com.jin.android.indiestage.ui.home.Home
+import com.jin.android.indiestage.ui.quickenter.QuickEnterScreen
 import com.jin.android.indiestage.ui.stage.Stage
 import com.jin.android.indiestage.ui.ticketbox.TicketBox
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +23,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun IndieStageApp(
+    application: IndieStage,
     appState: IndieStageAppState = rememberIndieStageAppState()
+
 ) {
     if (appState.isOnline) {
         NavHost(
@@ -30,9 +34,20 @@ fun IndieStageApp(
         ) {
             composable(Screen.Home.route) { backStackEntry ->
                 Home(
+                    checkedInDataSource = application.checkedInDataSource,
                     navigateToTicketBox = { exhibitionId ->
                         appState.navigateToTicketBox(exhibitionId, backStackEntry)
-                    }
+                    },
+                    navigateToQuickEnter = {appState.navigateToQuickEnter(backStackEntry)}
+                )
+            }
+            composable(Screen.QuickEnter.route){ navBackStackEntry->
+                QuickEnterScreen(
+                    onBackPress = appState::navigateBack,
+                    navigateToStage = { exhibitionId, mode ->
+                        appState.navigateToStage(exhibitionId, mode, navBackStackEntry)
+                    },
+                    checkedInDataSource = application.checkedInDataSource,
                 )
             }
             composable(Screen.Stage.route) { backStageEntry ->
@@ -62,7 +77,8 @@ fun IndieStageApp(
                         navigateToStage = { exhibitionId, mode ->
                             appState.navigateToStage(exhibitionId, mode, navBackStackEntry)
                         },
-                        exhibitionId = it
+                        exhibitionId = it,
+                        checkedInDataSource = application.checkedInDataSource,
                     )
                 }
             }

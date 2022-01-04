@@ -1,4 +1,4 @@
-package com.jin.android.indiestage.ui.ticketbox
+package com.jin.android.indiestage.ui.quickenter
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -11,7 +11,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -30,7 +29,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.permissions.*
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.jin.android.indiestage.R
@@ -41,19 +39,15 @@ import com.jin.android.indiestage.util.QrCodeAnalyzer
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
-@ExperimentalPermissionsApi
 @Composable
-fun TicketBox(
+fun QuickEnterScreen(
     onBackPress: () -> Unit,
     navigateToStage: (String, String) -> Unit,
-    exhibitionId: String,
     checkedInDataSource: CheckedInDataSource,
-    viewModel: TicketBoxViewModel = viewModel(
+    viewModel: QuickEnterViewModel = viewModel(
         factory = ViewModelFactory(
             checkedInDataSource = checkedInDataSource,
-            exhibitionRepo = ExhibitionRepo(),
-            exhibitionId = exhibitionId
+            exhibitionRepo = ExhibitionRepo()
         )
     )
 ) {
@@ -83,57 +77,56 @@ fun TicketBox(
     LaunchedEffect(key1 = true) { launcher.launch(Manifest.permission.CAMERA) }
 
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        TicketBoxAppBar(
-            title = "TicketBox",
-            onBackPress = onBackPress,
-            navigateToStage,
-            exhibitionId
-        )
-
-        if (hasCamPermission) {
-            QRCodeScanner(
-                context = context,
-                lifecycleOwner = lifecycleOwner,
-                navigateToStage = navigateToStage,
-                exhibitionId = exhibitionId,
-                viewModel = viewModel
+    Scaffold(
+        topBar = {
+            QuickEnterBoxAppBar(
+                title = "quick enter",
+                onBackPress = onBackPress
             )
-        } else {
-            IconButton(
-                onClick = { launcher.launch(Manifest.permission.CAMERA) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+        },
+        content = {
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        Modifier.align(Alignment.Center),
-                        verticalAlignment = Alignment.CenterVertically
+                if (hasCamPermission) {
+                    QuickQRScanner(
+                        context = context,
+                        lifecycleOwner = lifecycleOwner,
+                        navigateToStage = navigateToStage,
+                        viewModel = viewModel
+                    )
+                } else {
+                    IconButton(
+                        onClick = { launcher.launch(Manifest.permission.CAMERA) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "have to get permission")
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = stringResource(id = R.string.retry_label)
-                            )
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                Modifier.align(Alignment.Center),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(text = "have to get permission")
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = stringResource(id = R.string.retry_label)
+                                    )
+                                }
+                            }
+
                         }
                     }
-
                 }
             }
-        }
-    }
+        })
 }
 
 @Composable
-fun TicketBoxAppBar(
+fun QuickEnterBoxAppBar(
     title: String,
-    onBackPress: () -> Unit,
-    navigateToStage: (String, String) -> Unit,
-    exhibitionId: String
+    onBackPress: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -146,28 +139,19 @@ fun TicketBoxAppBar(
                 }
                 Text(modifier = Modifier.align(Alignment.CenterVertically), text = title)
             }
-        },
-        actions = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Button(
-                    onClick = { navigateToStage(exhibitionId, "guest") }
-                ) {
-                    Text("둘러보기")
-                }
-            }
         }
     )
 }
 
+
 @ExperimentalCoroutinesApi
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun QRCodeScanner(
+fun QuickQRScanner(
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    viewModel: TicketBoxViewModel,
-    navigateToStage: (String, String) -> Unit,
-    exhibitionId: String,
+    viewModel: QuickEnterViewModel,
+    navigateToStage: (String, String) -> Unit
 ) {
     val gson = Gson()
     var code by remember { mutableStateOf("") }
@@ -184,7 +168,7 @@ fun QRCodeScanner(
                 preview.setSurfaceProvider(previewView.surfaceProvider)
                 val imageAnalysis = ImageAnalysis.Builder()
                     .setTargetResolution(Size(previewView.width, previewView.height))
-                    .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
 
                 imageAnalysis.setAnalyzer(
@@ -209,9 +193,10 @@ fun QRCodeScanner(
             modifier = Modifier.fillMaxSize()
         )
         if (code != "") {
-            try{
-                viewModel.verifyEnterCode(gson.fromJson(code,QRMessage::class.java))
-            }catch (e: JsonSyntaxException){
+            try {
+                viewModel.verifyEnterCode(gson.fromJson(code, QRMessage::class.java))
+            } catch (e: JsonSyntaxException) {
+                viewModel.setWrongTicket()
                 e.printStackTrace()
             }
         }
@@ -219,31 +204,20 @@ fun QRCodeScanner(
 
         val state by viewModel.state.collectAsState()
         when (state) {
-            TicketBoxState.InitialState -> {
-
-            }
-            TicketBoxState.StartNavigation -> {
-                navigateToStage(exhibitionId, "auth")
+            QuickEnterState.InitialState -> {}
+            QuickEnterState.CertifiedTicket -> {
+                navigateToStage(viewModel.exhibitionId, "auth")
                 Toast.makeText(
                     context,
                     "인증되었습니다",
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            TicketBoxState.WrongEnterCode -> {
+            QuickEnterState.WrongTicket -> {
                 if (code != "") {
                     Toast.makeText(
                         context,
-                        "비밀번호 다름",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-            TicketBoxState.WrongId -> {
-                if (code != "") {
-                    Toast.makeText(
-                        context,
-                        "id 다름",
+                        "잘못된 티켓입니다",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

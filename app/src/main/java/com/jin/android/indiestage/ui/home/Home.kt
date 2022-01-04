@@ -1,139 +1,139 @@
 package com.jin.android.indiestage.ui.home
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.FactCheck
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import androidx.compose.ui.res.painterResource
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.ui.theme.MinContrastOfPrimaryVsSurface
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jin.android.indiestage.data.Exhibition
-import com.jin.android.indiestage.data.ExhibitionRepo
-import com.jin.android.indiestage.data.OnError
-import com.jin.android.indiestage.data.OnSuccess
+import com.jin.android.indiestage.data.*
+import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
+import com.jin.android.indiestage.ui.home.checkedin.CheckedInScreen
+import com.jin.android.indiestage.ui.home.explore.ExploreScreen
+import com.jin.android.indiestage.ui.home.explore.TabItem
 import com.jin.android.indiestage.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-
 
 @ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun Home(
     navigateToTicketBox: (String) -> Unit,
-    viewModel: HomeViewModel = viewModel(factory = ViewModelFactory(ExhibitionRepo()))
+    navigateToQuickEnter: ()->Unit,
+    checkedInDataSource: CheckedInDataSource,
+    viewModel: HomeViewModel = viewModel(
+        factory = ViewModelFactory(
+            checkedInDataSource,
+            ExhibitionRepo()
+        )
+    )
 ) {
+    val homeViewState by viewModel.state.collectAsState()
+
+    val tabItemList = mutableListOf<TabItem>()
+    when (val opened = homeViewState.openedExhibitionFlow) {
+        is OnSuccess -> {
+            opened.querySnapshot?.toObjects(Exhibition::class.java)?.let {
+                tabItemList.add(TabItem(
+                    title = "Opened Exhibitions",
+                    itemList = it,
+                    onItemClicked = navigateToTicketBox,
+                    getMoreInfoClicked = {}
+
+                ))
+            }
+        }
+        is OnError -> {
+            opened.exception?.printStackTrace()
+        }
+    }
+    when (val closed = homeViewState.closedExhibitionFlow) {
+        is OnSuccess -> {
+            closed.querySnapshot?.toObjects(Exhibition::class.java)?.let {
+                tabItemList.add(TabItem(
+                    title = "Closed Exhibitions",
+                    itemList = it,
+                    onItemClicked = navigateToTicketBox,
+                    getMoreInfoClicked = {}
+
+                ))
+            }
+        }
+        is OnError -> {
+            closed.exception?.printStackTrace()
+        }
+    }
+
     Surface(Modifier.fillMaxSize()) {
         HomeContent(
-            navigateToTicketBox = navigateToTicketBox,
-            modifier = Modifier.fillMaxSize(),
-            viewModel = viewModel
+            viewModel = viewModel,
+            tabItemList = tabItemList,
+            selectedHomeCategory = homeViewState.selectedHomeCategory,
+            onCategorySelected = viewModel::onHomeCategorySelected,
+            navigateToQuickEnter = navigateToQuickEnter
         )
     }
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @Composable
 fun HomeContent(
-    navigateToTicketBox: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    tabItemList: List<TabItem>,
+    selectedHomeCategory: HomeCategory,
+    onCategorySelected: (HomeCategory) -> Unit,
+    navigateToQuickEnter: ()->Unit,
 ) {
-    Column {
-        val surfaceColor = MaterialTheme.colors.surface
-        val dominantColorState = rememberDominantColorState { color ->
-            // We want a color which has sufficient contrast against the surface color
-            color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface
-        }
-
-        when (val exhibitions = viewModel.exhibitionStateFlow.collectAsState().value) {
-            is OnError -> {
-                Log.e("home", exhibitions.exception.toString())
-                Text("Error")
-            }
-            is OnSuccess -> {
-                exhibitions.querySnapshot?.toObjects(Exhibition::class.java)?.let {
-                    DynamicThemePrimaryColorsFromImage(dominantColorState) {
-                        val pagerState = rememberPagerState()
-                        val selectedImageUrl = it.getOrNull(pagerState.currentPage)?.image
-
-                        // When the selected image url changes, call updateColorsFromImageUrl() or reset()
-                        LaunchedEffect(selectedImageUrl) {
-                            if (selectedImageUrl != null) {
-                                dominantColorState.updateColorsFromImageUrl(selectedImageUrl)
-                            } else {
-                                dominantColorState.reset()
-                            }
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .verticalGradientScrim(
-                                    color = MaterialTheme.colors.primary.copy(alpha = 0.38f),
-                                    startYPercentage = 1f,
-                                    endYPercentage = 0f
-                                )
-                        ) {
-                            //val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
-                            val appBarColor = Color.Transparent
-
-                            Spacer(
-                                Modifier
-                                    .background(appBarColor)
-                                    .fillMaxWidth()
-                            )
-
-                            HomeAppBar(
-                                backgroundColor = appBarColor,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            )
-
-                            if (it.isNotEmpty()) {
-                                Spacer(Modifier.height(16.dp))
-                                HorizontalPager(
-                                    count = it.size,
-                                    state = pagerState,
-                                    modifier = modifier
-                                ) { page ->
-                                    PosterItem(
-                                        onClick = navigateToTicketBox,
-                                        item = it[page],
-                                        modifier = Modifier
-                                            .padding(4.dp)
-                                            .fillMaxHeight()
-                                    )
-                                }
-                                Spacer(Modifier.height(16.dp))
-                            }
-                        }
+    val fabShape = RoundedCornerShape(50)
+    Scaffold(
+        topBar = {
+            HomeTopAppBar(
+                backgroundColor = Color.Transparent,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        content = {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when (selectedHomeCategory) {
+                    HomeCategory.Exhibition -> {
+                        ExploreScreen(tabItemList = tabItemList)
+                    }
+                    HomeCategory.CheckedIn -> {
+                        CheckedInScreen(viewModel)
                     }
                 }
             }
+        },
+        floatingActionButton = { HomeFabButton(fabShape = fabShape, onClick = navigateToQuickEnter) },
+        isFloatingActionButtonDocked = true,
+        floatingActionButtonPosition = FabPosition.Center,
+        bottomBar = {
+            HomeBottomAppBar(
+                selectedHomeCategory = selectedHomeCategory,
+                onCategorySelected = onCategorySelected,
+                fabShape = fabShape
+            )
         }
-    }
+    )
 }
 
 @Composable
-fun HomeAppBar(
+fun HomeTopAppBar(
     backgroundColor: Color,
     modifier: Modifier = Modifier
 ) {
@@ -167,55 +167,50 @@ fun HomeAppBar(
 }
 
 @Composable
-private fun PosterItem(
-    onClick: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    item: Exhibition
+fun HomeBottomAppBar(
+    selectedHomeCategory: HomeCategory,
+    onCategorySelected: (HomeCategory) -> Unit,
+    fabShape: Shape
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
-    Column(
-        modifier
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        Box(
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterHorizontally)
-                .aspectRatio(0.7f)
-                .clickable(onClick = { expanded = !expanded })
-        ) {
-            Image(
-                painter = rememberImagePainter(data = item.image),
-                contentDescription = item.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(MaterialTheme.shapes.medium),
-            )
+    BottomAppBar(
+        cutoutShape = fabShape,
+        content = {
+            BottomNavigation {
+                BottomNavigationItem(
+                    icon = {
+                        Icon(Icons.Filled.Article, "")
+                    },
+                    label = { Text(text = stringResource(id = R.string.exhibition_tab)) },
+                    selected = selectedHomeCategory == HomeCategory.Exhibition,
+                    onClick = { onCategorySelected(HomeCategory.Exhibition) },
+                    alwaysShowLabel = false
+                )
 
-            if (expanded) {
-                Surface(
-                    color = colorResource(id = R.color.shadow50),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Button(
-                            onClick = { onClick(item.id) },
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text("전시 입장")
-                        }
-                    }
+                BottomNavigationItem(
+                    icon = {
+                        Icon(Icons.Filled.FactCheck, "")
+                    },
 
-                }
-
+                    label = { Text(text = stringResource(id = R.string.checked_in_tab)) },
+                    selected = selectedHomeCategory == HomeCategory.CheckedIn,
+                    onClick = { onCategorySelected(HomeCategory.CheckedIn) },
+                    alwaysShowLabel = false
+                )
             }
         }
-    }
+    )
 }
 
+@Composable
+fun HomeFabButton(
+    fabShape: Shape,
+    onClick: ()->Unit
+) {
+    FloatingActionButton(
+        onClick = { onClick() },
+        shape = fabShape,
+    ) {
+        Icon(Icons.Filled.Camera, "")
+    }
+}
