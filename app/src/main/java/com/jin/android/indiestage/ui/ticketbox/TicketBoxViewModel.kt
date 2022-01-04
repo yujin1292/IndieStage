@@ -3,14 +3,12 @@ package com.jin.android.indiestage.ui.ticketbox
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.ktx.toObjects
 import com.jin.android.indiestage.data.EnterCodeOnSuccess
 import com.jin.android.indiestage.data.Exhibition
 import com.jin.android.indiestage.data.ExhibitionRepo
 import com.jin.android.indiestage.data.OnSuccess
 import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
 import com.jin.android.indiestage.data.checkedin.CheckedInEntity
-import com.jin.android.indiestage.data.checkedin.CheckedInRepository
 import com.jin.android.indiestage.util.EnterCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

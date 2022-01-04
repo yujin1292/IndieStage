@@ -7,7 +7,7 @@ class CheckedInRepository(private val checkedInDao:CheckedInDao ) :CheckedInData
         return checkedInDao.getAll()
     }
 
-    override suspend fun checkIn(entity: CheckedInEntity) {
-        checkedInDao.insert(entity)
+    override suspend fun checkIn(checkedInEntity: CheckedInEntity) {
+        checkedInDao.insert(checkedInEntity)
     }
 }

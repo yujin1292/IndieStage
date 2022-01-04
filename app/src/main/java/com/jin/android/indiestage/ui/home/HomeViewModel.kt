@@ -1,12 +1,9 @@
 package com.jin.android.indiestage.ui.home
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
-import com.jin.android.indiestage.data.checkedin.CheckedInEntity
-import com.jin.android.indiestage.data.checkedin.CheckedInRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -14,7 +11,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 class HomeViewModel(
     private val exhibitionRepo: ExhibitionRepo,
-    private val checkedInDataSource: CheckedInDataSource?
+    checkedInDataSource: CheckedInDataSource?
 ) : ViewModel() {
 
     private lateinit var openedExhibitionFlow: Flow<ExhibitionResponse>

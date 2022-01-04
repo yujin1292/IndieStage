@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [CheckedInEntity::class], version = 1, exportSchema = false)
-abstract class CheckedInDatabase() : RoomDatabase() {
+abstract class CheckedInDatabase : RoomDatabase() {
 
     abstract fun checkedInDao(): CheckedInDao
 

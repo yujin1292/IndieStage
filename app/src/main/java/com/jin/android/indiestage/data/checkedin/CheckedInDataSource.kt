@@ -4,5 +4,5 @@ import androidx.lifecycle.LiveData
 
 interface CheckedInDataSource {
     fun getAllData(): LiveData<List<CheckedInEntity>>
-    suspend fun checkIn(exhibition: CheckedInEntity)
+    suspend fun checkIn(checkedInEntity: CheckedInEntity)
 }

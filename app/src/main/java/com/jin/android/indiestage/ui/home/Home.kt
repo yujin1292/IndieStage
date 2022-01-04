@@ -1,6 +1,5 @@
 package com.jin.android.indiestage.ui.home
 
-import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -21,7 +20,6 @@ import com.jin.android.indiestage.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
-import com.jin.android.indiestage.data.checkedin.CheckedInRepository
 import com.jin.android.indiestage.ui.home.checkedin.CheckedInScreen
 import com.jin.android.indiestage.ui.home.explore.ExploreScreen
 import com.jin.android.indiestage.ui.home.explore.TabItem
@@ -175,7 +173,7 @@ fun HomeBottomAppBar(
     BottomAppBar(
         cutoutShape = fabShape,
         content = {
-            BottomNavigation() {
+            BottomNavigation {
                 BottomNavigationItem(
                     icon = {
                         Icon(Icons.Filled.Article, "")

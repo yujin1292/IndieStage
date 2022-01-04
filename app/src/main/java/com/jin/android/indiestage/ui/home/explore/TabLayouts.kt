@@ -10,9 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -110,7 +108,7 @@ fun PosterItem(
 fun MoreExhibitions(
     onClick: () -> Unit
 ) {
-    Row() {
+    Row {
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,7 +117,7 @@ fun MoreExhibitions(
         Row(
             Modifier
                 .padding(end = 12.dp)
-                .clickable { onClick }) {
+                .clickable { onClick() }) {
             Text(text = "더 보러가기", style = MaterialTheme.typography.caption)
             Icon(imageVector = Icons.Outlined.ArrowRight, contentDescription = "more Info")
         }
