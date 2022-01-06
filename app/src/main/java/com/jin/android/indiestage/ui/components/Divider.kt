@@ -1,6 +1,7 @@
 package com.jin.android.indiestage.ui.components
 
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,7 +17,7 @@ fun IndieStageDivider(
     startIndent: Dp = 0.dp
 ) {
     Divider(
-        modifier = modifier,
+        modifier = modifier.padding(start=5.dp, end=5.dp),
         color = color,
         thickness = thickness,
         startIndent = startIndent

@@ -2,13 +2,11 @@ package com.jin.android.indiestage.ui.stage
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -21,15 +19,17 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
-import com.jin.android.indiestage.ui.components.IndieStageDivider
+import com.jin.android.indiestage.ui.components.*
 import com.jin.android.indiestage.util.ViewModelFactory
 import com.jin.android.indiestage.util.lerp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -103,7 +103,7 @@ fun StageScreen(
                 navigateToArtWork = navigateToArtWork,
                 exhibition = exhibition
             )
-            Title(exhibition, scroll.value)
+            Title(exhibition, artist, scroll.value)
             ProfileImage(artist.image, scroll.value)
             Up(onBackPress)
         } else {
@@ -178,13 +178,23 @@ private fun Body(
                     Spacer(Modifier.height(ImageOverlap))
                     Spacer(Modifier.height(TitleHeight))
 
-                    Spacer(Modifier.height(16.dp))
-                    InfoScreen(artist = artist, exhibition = exhibition)
+                    // 작품 소개말
+                    ExhibitionDescription(exhibition = exhibition)
 
+                    // 작가 소개
+                    ArtistInfoScreen(artist = artist)
                     Spacer(Modifier.height(40.dp))
-                    // TODO 장르 / 해쉬태그  Chip 형태 표기
 
-                    Spacer(Modifier.height(16.dp))
+                    IndieStageDivider()
+                    MidSpacer()
+                    Text(
+                        text = stringResource(id = R.string.artworks),
+                        style = MaterialTheme.typography.subtitle2,
+                        fontSize = 20.sp,
+                        modifier = HzPadding,
+                        textAlign = TextAlign.Center
+                    )
+                    ShortSpacer()
                     // 작품 리스트
                     artWorks.forEach { artWork ->
                         ArtWorkElement(
@@ -206,28 +216,59 @@ private fun Body(
 }
 
 @Composable
-private fun InfoScreen(exhibition: Exhibition, artist: Artist) {
+private fun ExhibitionDescription(exhibition: Exhibition) {
+    var expended by remember { mutableStateOf(false) }
+    // 해쉬태그  Chip 형태 표기
+    MidSpacer()
+    HashTags()
 
-    Spacer(Modifier.height(16.dp))
+    MidSpacer()
     Text(
         text = exhibition.description.replace("\\n", "\n"),
+        maxLines = if (!expended) 4 else Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis,
         modifier = HzPadding
     )
-    Spacer(Modifier.height(16.dp))
-    IndieStageDivider()
-    Spacer(Modifier.height(16.dp))
+    val textButton = if (!expended) "see More" else "see Less"
     Text(
-        text = artist.name,
-        style = MaterialTheme.typography.h6,
+        text = textButton,
+        style = MaterialTheme.typography.button,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .heightIn(20.dp)
+            .fillMaxWidth()
+            .padding(top = 15.dp)
+            .clickable {
+                expended = !expended
+            }
+    )
+    MidSpacer()
+}
+
+@Composable
+private fun ArtistInfoScreen(artist: Artist) {
+
+
+    IndieStageDivider()
+    MidSpacer()
+    Text(
+        text = stringResource(id = R.string.artist_info),
+        style = MaterialTheme.typography.subtitle2,
+        fontSize = 20.sp,
         modifier = HzPadding
     )
-    Spacer(Modifier.height(8.dp))
+    ShortSpacer()
+    // Intro
+    Text(
+        text = stringResource(id = R.string.intro),
+        textDecoration = TextDecoration.Underline,
+        modifier = HzPadding
+    )
     Text(
         text = artist.intro.replace("\\n", "\n"),
         modifier = HzPadding
     )
-
-    Spacer(Modifier.height(16.dp))
+    MidSpacer()
 
 
     Text(
@@ -239,12 +280,12 @@ private fun InfoScreen(exhibition: Exhibition, artist: Artist) {
         text = artist.email,
         modifier = HzPadding
     )
-    Spacer(Modifier.height(16.dp))
     Text(
         text = artist.homepage,
         modifier = HzPadding
     )
-    Spacer(Modifier.height(16.dp))
+
+    MidSpacer()
 
     var seeMore by remember { mutableStateOf(true) }
     Text(
@@ -252,7 +293,6 @@ private fun InfoScreen(exhibition: Exhibition, artist: Artist) {
         textDecoration = TextDecoration.Underline,
         modifier = HzPadding
     )
-    Spacer(Modifier.height(8.dp))
     Text(
         text = artist.history.replace("\\n", "\n"),
         style = MaterialTheme.typography.body1,
@@ -260,6 +300,7 @@ private fun InfoScreen(exhibition: Exhibition, artist: Artist) {
         overflow = TextOverflow.Ellipsis,
         modifier = HzPadding
     )
+
     val textButton = if (seeMore) "see More" else "see Less"
 
     Text(
@@ -278,7 +319,7 @@ private fun InfoScreen(exhibition: Exhibition, artist: Artist) {
 }
 
 @Composable
-private fun Title(exhibition: Exhibition, scroll: Int) {
+private fun Title(exhibition: Exhibition, artist: Artist, scroll: Int) {
     val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
     val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
     val offset = (maxOffset - scroll).coerceAtLeast(minOffset)
@@ -291,19 +332,42 @@ private fun Title(exhibition: Exhibition, scroll: Int) {
             .graphicsLayer { translationY = offset }
             .background(color = MaterialTheme.colors.background)
     ) {
-        Spacer(Modifier.height(16.dp))
+        MidSpacer()
         Text(
             text = exhibition.title,
             style = MaterialTheme.typography.h4,
             modifier = HzPadding
         )
-        Spacer(Modifier.height(8.dp))
+        ShortSpacer()
         Text(
-            text = "sub title",
+            text = artist.name,
             style = MaterialTheme.typography.subtitle2,
             fontSize = 20.sp,
             modifier = HzPadding
         )
+        MidSpacer()
+    }
+}
+
+@Composable
+private fun HashTags(
+    list: List<String> = listOf(
+        "#hashtag",
+        "#genre",
+        " #IndieStage",
+        "#hi",
+        "#hashtag",
+        "#genre",
+        " #IndieStage"
+    )
+) {
+    ChipVerticalGrid(
+        spacing = 5.dp,
+        modifier = Modifier.padding(horizontal = 24.dp)
+    ) {
+        list.forEach { tag ->
+            BorderChip(text = tag)
+        }
     }
 }
 
@@ -360,35 +424,6 @@ private fun CollapsingImageLayout(
 }
 
 
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-fun CircleImage(
-    imageUrl: String,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-    elevation: Dp = 0.dp
-) {
-    Surface(
-        color = Color.LightGray,
-        elevation = elevation,
-        shape = CircleShape,
-        modifier = modifier
-    ) {
-        Image(
-            painter = rememberImagePainter(
-                data = imageUrl,
-                builder = {
-                    crossfade(true)
-                    placeholder(drawableResId = R.drawable.ic_launcher_foreground)
-                }
-            ),
-            contentDescription = contentDescription,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
-    }
-}
-
 @Composable
 fun ArtWorkElement(
     navigateToArtWork: (
@@ -402,8 +437,8 @@ fun ArtWorkElement(
         modifier = Modifier
             .clickable { navigateToArtWork(exhibitionId, item.id) }
             .fillMaxWidth()
-            .aspectRatio(4f)
-            .padding(end = 10.dp)
+            .aspectRatio(2.5f)
+            .padding(10.dp)
     ) {
         Box {
             Image(
@@ -425,21 +460,5 @@ fun ArtWorkElement(
             )
         }
 
-    }
-}
-
-@Composable
-fun StageAppBar(
-    title: String,
-    onBackPress: () -> Unit
-) {
-    Row(Modifier.fillMaxWidth()) {
-        IconButton(onClick = onBackPress) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = stringResource(R.string.back)
-            )
-        }
-        Text(modifier = Modifier.align(CenterVertically), text = title)
     }
 }
