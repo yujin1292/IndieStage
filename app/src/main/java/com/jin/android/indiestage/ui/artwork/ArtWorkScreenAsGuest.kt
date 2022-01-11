@@ -2,6 +2,9 @@ package com.jin.android.indiestage.ui.artwork
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -13,12 +16,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.ArtWork
 import com.jin.android.indiestage.data.ArtWorkOnError
@@ -93,29 +92,12 @@ fun ArtWorkAppbarAsGuest(
 @ExperimentalPagerApi
 @Composable
 fun ArtWorkPagerAsGuest(artWork: ArtWork) {
-    val pagerState = rememberPagerState()
-    Row(Modifier.fillMaxSize()) {
-        Column(
-            Modifier.align(Alignment.CenterVertically)
-        ) {
-            HorizontalPager(
-                count = artWork.pageNum,
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                GuestPage()
-            }
-
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
+    val listState = rememberLazyListState()
+    LazyColumn(state = listState) {
+        itemsIndexed(artWork.contents) { _, _ ->
+            GuestPage()
         }
     }
-
 }
 
 @Composable
