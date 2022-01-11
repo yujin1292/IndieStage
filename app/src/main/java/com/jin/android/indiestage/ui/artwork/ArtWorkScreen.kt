@@ -4,6 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -23,14 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 import com.jin.android.indiestage.util.ViewModelFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 
 @ExperimentalCoroutinesApi
 @ExperimentalPagerApi
@@ -66,6 +66,7 @@ fun ArtWorkScreen(
         }
     }
 }
+
 @ExperimentalPagerApi
 @Composable
 fun ArtWorkContents(
@@ -98,32 +99,15 @@ fun ArtWorkAppbar(
 @ExperimentalPagerApi
 @Composable
 fun ArtWorkPager(artWork: ArtWork) {
-    val pagerState = rememberPagerState()
-    Row(Modifier.fillMaxSize()) {
-        Column(
-            Modifier.align(CenterVertically)
-        ) {
-            HorizontalPager(
-                count = artWork.pageNum,
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) { page ->
-                AuthPage(
-                    page,
-                    artWork.contents[page]
-                )
-            }
-
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.CenterHorizontally)
+    val listState = rememberLazyListState()
+    LazyColumn(state = listState) {
+        itemsIndexed(artWork.contents) { index, item ->
+            AuthPage(
+                index,
+                item
             )
         }
     }
-
 }
 
 
