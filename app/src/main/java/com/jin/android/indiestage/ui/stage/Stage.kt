@@ -77,7 +77,6 @@ fun Stage(
 
     StageScreen(
         navigateToArtWork = navigateToArtWork,
-        bookMarkDataSource = bookMarkDataSource,
         exhibitionId = exhibitionId,
         exhibitionResponse = viewState.exhibitionFlow,
         artistResponse = viewState.artistInfoFlow,
@@ -93,7 +92,6 @@ fun StageScreen(
         exhibitionId: String,
         artWorkId: String
     ) -> Unit,
-    bookMarkDataSource: BookMarkDataSource,
     exhibitionResponse: ExhibitionResponse,
     artistResponse: ArtistResponse,
     artWorksResponse: ArtWorksResponse,
@@ -130,14 +128,7 @@ fun StageScreen(
             FavoriteButton(
                 isChecked = exhibitionEntity.isBookMarked,
                 onClick = {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        bookMarkDataSource.setBookmark(
-                            exhibitionEntity
-                        )
-                        exhibitionEntity.apply {
-                            isBookMarked = isBookMarked.not()
-                        }
-                    }
+                    viewModel.clickBookMark()
                 },
 
                 modifier = Modifier.align(TopEnd)

@@ -1,12 +1,13 @@
 package com.jin.android.indiestage.ui.stage
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.firestore.*
 import com.jin.android.indiestage.data.room.BookMarkDataSource
 import com.jin.android.indiestage.data.room.ExhibitionEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -48,6 +49,15 @@ class StageViewModel(
             }
 
 
+        }
+    }
+
+    fun clickBookMark() {
+        viewModelScope.launch {
+            exhibitionEntity.value?.let {
+                bookMarkDataSource?.setBookmark(it)
+                it.isBookMarked = it.isBookMarked.not()
+            }
         }
     }
 }
