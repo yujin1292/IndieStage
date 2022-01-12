@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.*
-import com.jin.android.indiestage.data.checkedin.CheckedInEntity
+import com.jin.android.indiestage.data.room.ExhibitionEntity
 import com.jin.android.indiestage.ui.home.HomeViewModel
 import com.jin.android.indiestage.util.lerp
 import kotlin.math.absoluteValue
@@ -27,27 +27,31 @@ import kotlin.math.absoluteValue
 @ExperimentalPagerApi
 @Composable
 fun CheckedInScreen(viewModel: HomeViewModel) {
-    val list = viewModel.checkedInList.observeAsState(arrayListOf()).value
+
+    val bookmarkedList = viewModel.bookmarkedList.observeAsState(arrayListOf()).value
+    val checkedInList = viewModel.checkedInList.observeAsState(arrayListOf()).value
+
     val listState = rememberLazyListState()
 
-    val tickets = listOf("one", "two") // TODO 임시데이터 -> 저장된 데이터로 변경
 
     LazyColumn(state = listState) {
         item {
-            Column() {
-                Text(
-                    text = "입장 가능한 전시", style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(12.dp)
-                )
-                CheckedInPager(list)
-                Text(
-                    text = "사용한 티켓", style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(12.dp)
-                )
-            }
+            Text(
+                text = "즐겨찾기한 전시", style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
+        item {
+            CheckedInPager(bookmarkedList)
+        }
+        item {
+            Text(
+                text = "사용한 티켓", style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(12.dp)
+            )
         }
         items(
-            items = tickets,
+            items = checkedInList,
             itemContent = { item -> Ticket(item) }
         )
         item { Spacer(modifier = Modifier.height(64.dp)) }
@@ -56,11 +60,11 @@ fun CheckedInScreen(viewModel: HomeViewModel) {
 
 @ExperimentalPagerApi
 @Composable
-fun CheckedInPager(checkedInList: List<CheckedInEntity>) {
+fun CheckedInPager(exhibitionList: List<ExhibitionEntity>) {
     val pagerState = rememberPagerState()
     Column() {
         HorizontalPager(
-            count = checkedInList.size,
+            count = exhibitionList.size,
             state = pagerState,
             modifier = Modifier
         ) { page ->
@@ -92,7 +96,7 @@ fun CheckedInPager(checkedInList: List<CheckedInEntity>) {
                     .padding(start = 64.dp, end = 64.dp)
                     .aspectRatio(0.7f)
             )
-            { CheckedInPage(checkedInList[page]) }
+            { CheckedInPage(exhibitionList[page]) }
         }
         HorizontalPagerIndicator(
             pagerState = pagerState,
@@ -105,7 +109,7 @@ fun CheckedInPager(checkedInList: List<CheckedInEntity>) {
 }
 
 @Composable
-fun CheckedInPage(item: CheckedInEntity) {
+fun CheckedInPage(item: ExhibitionEntity) {
     Column() {
         Image(
             painter = rememberImagePainter(data = item.image),
@@ -131,7 +135,7 @@ fun CheckedInPage(item: CheckedInEntity) {
 }
 
 @Composable
-fun Ticket(item: String) {
+fun Ticket(exhibitionEntity: ExhibitionEntity) {
     Card(modifier = Modifier.padding(10.dp)) {
         Box(
             modifier = Modifier
@@ -140,7 +144,7 @@ fun Ticket(item: String) {
                 .background(androidx.compose.ui.graphics.Color.Yellow)
         ) {
             Text(
-                text = item,
+                text = exhibitionEntity.title,
                 modifier = Modifier.align(Center)
             )
         }

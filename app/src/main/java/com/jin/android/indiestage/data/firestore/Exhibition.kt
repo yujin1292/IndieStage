@@ -1,4 +1,4 @@
-package com.jin.android.indiestage.data
+package com.jin.android.indiestage.data.firestore
 
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
@@ -9,11 +9,11 @@ data class Exhibition (
     val title: String,
     val image: String,
     val description:String,
-    val artist:Artist,
-    val artwork:ArtWork,
+    val artist: Artist,
+    val artwork: ArtWork,
     val enterCode: String
 ){
-    constructor():this("", true,"","","",Artist(),ArtWork(),"")
+    constructor():this("", true,"","","", Artist(), ArtWork(),"")
 }
 
 sealed class ExhibitionResponse

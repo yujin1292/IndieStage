@@ -8,8 +8,9 @@
     <string name="history" translatable="false">History</string>
     <string name="contact" translatable="false">Contacts</string>
     <string name="exhibition_tab">Exhibitions</string>
-    <string name="checked_in_tab">Checked In</string>
+    <string name="my_tab">My</string>
     <string name="intro" translatable="false">intro</string>
     <string name="artist_info" translatable="false">Artist Information</string>
     <string name="artworks" translatable="false">Art Works</string>
+    <string name="bookmark">bookmark</string>
 </resources>

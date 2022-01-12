@@ -1,4 +1,4 @@
-package com.jin.android.indiestage.data
+package com.jin.android.indiestage.data.firestore
 
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
 @ExperimentalCoroutinesApi
-class ExhibitionRepo {
+class ExhibitionRepository {
     private val fireStore = FirebaseFirestore.getInstance()
 
     fun getAllExhibitions() = callbackFlow {

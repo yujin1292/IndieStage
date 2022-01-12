@@ -1,4 +1,4 @@
-package com.jin.android.indiestage.data
+package com.jin.android.indiestage.data.firestore
 
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException

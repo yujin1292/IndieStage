@@ -18,8 +18,12 @@ import androidx.compose.ui.res.painterResource
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.jin.android.indiestage.R
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jin.android.indiestage.data.*
-import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
+import com.jin.android.indiestage.data.firestore.Exhibition
+import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.OnError
+import com.jin.android.indiestage.data.firestore.OnSuccess
+import com.jin.android.indiestage.data.room.BookMarkDataSource
+import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.ui.home.checkedin.CheckedInScreen
 import com.jin.android.indiestage.ui.home.explore.ExploreScreen
 import com.jin.android.indiestage.ui.home.explore.TabItem
@@ -33,10 +37,12 @@ fun Home(
     navigateToTicketBox: (String) -> Unit,
     navigateToQuickEnter: ()->Unit,
     checkedInDataSource: CheckedInDataSource,
+    bookMarkDataSource: BookMarkDataSource,
     viewModel: HomeViewModel = viewModel(
         factory = ViewModelFactory(
             checkedInDataSource,
-            ExhibitionRepo()
+            bookMarkDataSource,
+            ExhibitionRepository()
         )
     )
 ) {
@@ -113,7 +119,7 @@ fun HomeContent(
                     HomeCategory.Exhibition -> {
                         ExploreScreen(tabItemList = tabItemList)
                     }
-                    HomeCategory.CheckedIn -> {
+                    HomeCategory.My -> {
                         CheckedInScreen(viewModel)
                     }
                 }
@@ -192,9 +198,9 @@ fun HomeBottomAppBar(
                         Icon(Icons.Filled.FactCheck, "")
                     },
 
-                    label = { Text(text = stringResource(id = R.string.checked_in_tab)) },
-                    selected = selectedHomeCategory == HomeCategory.CheckedIn,
-                    onClick = { onCategorySelected(HomeCategory.CheckedIn) },
+                    label = { Text(text = stringResource(id = R.string.my_tab)) },
+                    selected = selectedHomeCategory == HomeCategory.My,
+                    onClick = { onCategorySelected(HomeCategory.My) },
                     alwaysShowLabel = false
                 )
             }

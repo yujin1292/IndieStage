@@ -16,7 +16,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.Exhibition
+import com.jin.android.indiestage.data.firestore.Exhibition
 
 @Composable
 fun TabLayouts(tabItems: List<TabItem>) {
