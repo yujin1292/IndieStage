@@ -2,8 +2,8 @@ package com.jin.android.indiestage.ui.artwork
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jin.android.indiestage.data.ArtWorkResponse
-import com.jin.android.indiestage.data.ExhibitionRepo
+import com.jin.android.indiestage.data.firestore.ArtWorkResponse
+import com.jin.android.indiestage.data.firestore.ExhibitionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 class ArtWorkViewModel(
-    private val exhibitionRepo: ExhibitionRepo,
+    private val exhibitionRepository: ExhibitionRepository,
     private val exhibitionId: String,
     private val artWorkId: String
 ) : ViewModel() {
@@ -19,7 +19,7 @@ class ArtWorkViewModel(
     val artWorkStateFlow = MutableStateFlow<ArtWorkResponse?>(null)
     init {
         viewModelScope.launch {
-            exhibitionRepo.getArtWork(exhibitionId, artWorkId).collect {
+            exhibitionRepository.getArtWork(exhibitionId, artWorkId).collect {
                 artWorkStateFlow.value = it
             }
         }

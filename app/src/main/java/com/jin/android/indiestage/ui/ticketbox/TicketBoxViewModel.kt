@@ -4,8 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.*
-import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
-import com.jin.android.indiestage.data.checkedin.CheckedInEntity
+import com.jin.android.indiestage.data.firestore.EnterCodeOnSuccess
+import com.jin.android.indiestage.data.firestore.Exhibition
+import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.OnSuccess
+import com.jin.android.indiestage.data.room.CheckedInDataSource
+import com.jin.android.indiestage.data.room.ExhibitionEntity
 import com.jin.android.indiestage.ui.ticketbox.TicketBoxState.*
 import com.jin.android.indiestage.util.EnterCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,7 +20,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 class TicketBoxViewModel(
     private val checkedInDataSource: CheckedInDataSource?,
-    private val exhibitionRepo: ExhibitionRepo,
+    private val exhibitionRepository: ExhibitionRepository,
     private val exhibitionId: String,
 ) : ViewModel() {
     val state: MutableStateFlow<TicketBoxState> = MutableStateFlow(InitialState)
@@ -27,7 +31,7 @@ class TicketBoxViewModel(
     init {
         viewModelScope.launch {
             launch {
-                exhibitionRepo.getExhibitionEnterCode(exhibitionId).collect {
+                exhibitionRepository.getExhibitionEnterCode(exhibitionId).collect {
                     when (it) {
                         is EnterCodeOnSuccess -> {
                             enterCode = it.enterCode
@@ -42,7 +46,7 @@ class TicketBoxViewModel(
 
 
             launch {
-                exhibitionRepo.getExhibitionsById(exhibitionId).collect {
+                exhibitionRepository.getExhibitionsById(exhibitionId).collect {
                     when (it) {
                         is OnSuccess -> {
                             exhibition =
@@ -67,7 +71,7 @@ class TicketBoxViewModel(
         viewModelScope.launch {
             val isMatched = EnterCode.verifyEnterCode(msg.enterCode, enterCode)
             if (isMatched) {
-                checkedInDataSource?.checkIn(CheckedInEntity(exhibition))
+                checkedInDataSource?.checkIn(ExhibitionEntity(exhibition))
                 state.value = StartNavigation
             }else{
                 state.value = WrongEnterCode

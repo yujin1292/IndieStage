@@ -35,6 +35,7 @@ fun IndieStageApp(
             composable(Screen.Home.route) { backStackEntry ->
                 Home(
                     checkedInDataSource = application.checkedInDataSource,
+                    bookMarkDataSource = application.bookMarkDataSource,
                     navigateToTicketBox = { exhibitionId ->
                         appState.navigateToTicketBox(exhibitionId, backStackEntry)
                     },
@@ -55,6 +56,7 @@ fun IndieStageApp(
                     backStageEntry.arguments?.getString("mode")?.let { mode ->
                         Stage(
                             onBackPress = appState::navigateBack,
+                            bookMarkDataSource = application.bookMarkDataSource,
                             exhibitionId = exhibitionId,
                             navigateToArtWork = { exhibitionId, artWorkId ->
                                 appState.navigateToArtWork(
@@ -63,6 +65,7 @@ fun IndieStageApp(
                                     mode = mode,
                                     from = backStageEntry
                                 )
+
                             }
                         )
                     }

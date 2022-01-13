@@ -1,21 +1,24 @@
 package com.jin.android.indiestage
 
 import android.app.Application
-import com.jin.android.indiestage.data.checkedin.CheckedInDataSource
-import com.jin.android.indiestage.data.checkedin.CheckedInDatabase
-import com.jin.android.indiestage.data.checkedin.CheckedInRepository
+import com.jin.android.indiestage.data.room.BookMarkDataSource
+import com.jin.android.indiestage.data.room.CheckedInDataSource
+import com.jin.android.indiestage.data.room.MyPageDatabase
+import com.jin.android.indiestage.data.room.MyPageRepository
 
-class IndieStage :Application(){
+class IndieStage : Application() {
 
-    private lateinit var _checkedInRepository: CheckedInRepository
+    private lateinit var _myPageRepository: MyPageRepository
+    val bookMarkDataSource: BookMarkDataSource
+        get() = _myPageRepository
     val checkedInDataSource: CheckedInDataSource
-        get() = _checkedInRepository
+        get() = _myPageRepository
 
     override fun onCreate() {
         super.onCreate()
 
-        val checkedInDatabase = CheckedInDatabase.getDataBase(this)
-        _checkedInRepository = CheckedInRepository(checkedInDatabase.checkedInDao())
+        val checkedInDatabase = MyPageDatabase.getDataBase(this)
+        _myPageRepository = MyPageRepository(checkedInDatabase.checkedInDao())
 
     }
 }

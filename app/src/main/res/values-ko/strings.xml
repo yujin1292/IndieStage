@@ -6,5 +6,6 @@
     <string name="setting">설정</string>
     <string name="back">뒤로가기</string>
     <string name="exhibition_tab">전시</string>
-    <string name="checked_in_tab">보관함</string>
+    <string name="my_tab">보관함</string>
+    <string name="bookmark">bookmark</string>
 </resources>

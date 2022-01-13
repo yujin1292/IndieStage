@@ -28,6 +28,7 @@ import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.*
+import com.jin.android.indiestage.data.firestore.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.*
@@ -41,7 +42,7 @@ fun ArtWorkScreen(
     artWorkId: String,
     viewModel: ArtWorkViewModel = viewModel(
         factory = ViewModelFactory(
-            exhibitionRepo = ExhibitionRepo(),
+            exhibitionRepository = ExhibitionRepository(),
             exhibitionId = exhibitionId,
             artWorkId = artWorkId
         )

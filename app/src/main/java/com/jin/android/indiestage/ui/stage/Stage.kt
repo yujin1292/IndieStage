@@ -2,11 +2,14 @@ package com.jin.android.indiestage.ui.stage
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -28,7 +31,9 @@ import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.*
+import com.jin.android.indiestage.data.firestore.*
+import com.jin.android.indiestage.data.room.BookMarkDataSource
+import com.jin.android.indiestage.data.room.ExhibitionEntity
 import com.jin.android.indiestage.ui.components.*
 import com.jin.android.indiestage.util.ViewModelFactory
 import com.jin.android.indiestage.util.lerp
@@ -51,11 +56,13 @@ private val HzPadding = Modifier.padding(horizontal = 24.dp)
 @Composable
 fun Stage(
     onBackPress: () -> Unit,
+    bookMarkDataSource: BookMarkDataSource,
     navigateToArtWork: (exhibitionId: String, artWorkId: String) -> Unit,
     exhibitionId: String,
     viewModel: StageViewModel = viewModel(
         factory = ViewModelFactory(
-            exhibitionRepo = ExhibitionRepo(),
+            exhibitionRepository = ExhibitionRepository(),
+            bookMarkDataSource = bookMarkDataSource,
             exhibitionId = exhibitionId
         )
     )
@@ -69,10 +76,12 @@ fun Stage(
         exhibitionResponse = viewState.exhibitionFlow,
         artistResponse = viewState.artistInfoFlow,
         artWorksResponse = viewState.artWorkInfoFlow,
-        onBackPress = onBackPress
+        onBackPress = onBackPress,
+        viewModel = viewModel
     )
 }
 
+@ExperimentalCoroutinesApi
 @Composable
 fun StageScreen(
     navigateToArtWork: (
@@ -83,7 +92,8 @@ fun StageScreen(
     artistResponse: ArtistResponse,
     artWorksResponse: ArtWorksResponse,
     exhibitionId: String,
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    viewModel: StageViewModel
 ) {
     Box(Modifier.fillMaxSize()) {
         val scroll = rememberScrollState(0)
@@ -105,7 +115,11 @@ fun StageScreen(
             )
             Title(exhibition, artist, scroll.value)
             ProfileImage(artist.image, scroll.value)
-            Up(onBackPress)
+            Back(onBackPress)
+
+
+            BookMark(viewModel = viewModel, modifier = Modifier.align(TopEnd))
+
         } else {
             if (artistResponse is ArtistOnError) artistResponse.exception?.printStackTrace()
             if (artWorksResponse is ArtWorksOnError) artWorksResponse.exception?.printStackTrace()
@@ -114,6 +128,27 @@ fun StageScreen(
         }
 
     }
+}
+
+@ExperimentalCoroutinesApi
+@Composable
+fun BookMark(viewModel: StageViewModel, modifier: Modifier) {
+
+    val entity =
+        viewModel.exhibitionEntity.observeAsState(ExhibitionEntity()).value
+
+    var check by remember { mutableStateOf(entity.isBookMarked) }
+    check = entity.isBookMarked
+
+    FavoriteButton(
+        isChecked = check,
+        onClick = {
+            check = check.not()
+            viewModel.clickBookMark()
+        },
+        modifier = modifier
+    )
+
 }
 
 @Composable
@@ -135,20 +170,24 @@ private fun Header(imageUrl: String) {
 }
 
 @Composable
-private fun Up(upPress: () -> Unit) {
+private fun Back(backPress: () -> Unit) {
     IconButton(
-        onClick = upPress,
+        onClick = backPress,
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .size(36.dp)
-            .background(Color.Transparent)
+            .size(52.dp)
+            .background(
+                color = Color.White.copy(alpha = 0.32f),
+                shape = CircleShape
+            )
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
-            contentDescription = stringResource(R.string.back)
+            contentDescription = stringResource(R.string.bookmark)
         )
     }
 }
+
 
 @Composable
 private fun Body(
