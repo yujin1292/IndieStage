@@ -15,7 +15,7 @@ interface MyPageDao {
     fun getAllBookMarkedData(): LiveData<List<ExhibitionEntity>>
 
     @Query("SELECT * FROM exhibition WHERE id =:id")
-    fun getEntity(id:String):LiveData<ExhibitionEntity>
+    suspend fun getEntity(id:String):Array<ExhibitionEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: ExhibitionEntity)

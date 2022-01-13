@@ -1,6 +1,8 @@
 package com.jin.android.indiestage.ui.quickenter
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.*
@@ -11,22 +13,31 @@ import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.data.room.ExhibitionEntity
 import com.jin.android.indiestage.ui.quickenter.QuickEnterState.*
 import com.jin.android.indiestage.util.EnterCode
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class QuickEnterViewModel(
     private val checkedInDataSource: CheckedInDataSource?,
     private val exhibitionRepository: ExhibitionRepository
 ) : ViewModel() {
 
-    val _state = MutableStateFlow<QuickEnterState>(InitialState)
+    private val _state = MutableStateFlow<QuickEnterState>(InitialState)
     val state: StateFlow<QuickEnterState>
         get() = _state
     var exhibitionId: String = ""
+
+    private var _exhibitionEntity = MutableLiveData(ExhibitionEntity())
+    val exhibitionEntity: LiveData<ExhibitionEntity>
+        get() = _exhibitionEntity
+
     fun verifyEnterCode(msg: QRMessage) {
         viewModelScope.launch {
+
+
             exhibitionRepository.getExhibitionsById(msg.id).collect { response ->
                 when (response) {
                     is OnSuccess -> {

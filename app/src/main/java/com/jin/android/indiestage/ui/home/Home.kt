@@ -24,7 +24,7 @@ import com.jin.android.indiestage.data.firestore.OnError
 import com.jin.android.indiestage.data.firestore.OnSuccess
 import com.jin.android.indiestage.data.room.BookMarkDataSource
 import com.jin.android.indiestage.data.room.CheckedInDataSource
-import com.jin.android.indiestage.ui.home.checkedin.CheckedInScreen
+import com.jin.android.indiestage.ui.home.my.MyScreen
 import com.jin.android.indiestage.ui.home.explore.ExploreScreen
 import com.jin.android.indiestage.ui.home.explore.TabItem
 import com.jin.android.indiestage.util.*
@@ -120,7 +120,7 @@ fun HomeContent(
                         ExploreScreen(tabItemList = tabItemList)
                     }
                     HomeCategory.My -> {
-                        CheckedInScreen(viewModel)
+                        MyScreen(viewModel)
                     }
                 }
             }

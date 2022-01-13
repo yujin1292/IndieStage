@@ -1,15 +1,11 @@
 package com.jin.android.indiestage.data.room
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 
 class MyPageRepository(private val myPageDao: MyPageDao) : CheckedInDataSource, BookMarkDataSource {
 
-    override fun getEntity(id: String): LiveData<ExhibitionEntity> {
-        myPageDao.getEntity(id).let {
-            return if (it.value == null) it
-            else MutableLiveData(ExhibitionEntity())
-        }
+    override suspend fun getEntity(id: String): Array<ExhibitionEntity> {
+        return myPageDao.getEntity(id)
     }
 
     override fun getAllCheckedInData(): LiveData<List<ExhibitionEntity>> {
@@ -21,25 +17,32 @@ class MyPageRepository(private val myPageDao: MyPageDao) : CheckedInDataSource, 
     }
 
     override suspend fun setBookmark(exhibitionEntity: ExhibitionEntity) {
-        if (myPageDao.getCount(exhibitionEntity.id) > 0) {
-            exhibitionEntity.apply { isBookMarked = !isBookMarked }
-            myPageDao.update(exhibitionEntity)
-        } else {
-            exhibitionEntity.isBookMarked = true
-            myPageDao.insert(exhibitionEntity)
+
+        val data = myPageDao.getEntity(exhibitionEntity.id)
+        data.let { array ->
+            if(array.isEmpty()) {
+                exhibitionEntity.isBookMarked = true
+                myPageDao.insert(exhibitionEntity)
+            } else {
+                exhibitionEntity.isBookMarked = exhibitionEntity.isBookMarked.not()
+                myPageDao.update(exhibitionEntity)
+
+            }
         }
     }
 
     override suspend fun checkIn(exhibitionEntity: ExhibitionEntity) {
-        if (myPageDao.getCount(exhibitionEntity.id) > 0) {
-            getEntity(exhibitionEntity.id).value?.apply{
-                isCheckedIn = true
-            }?.let { myPageDao.insert(it) }
-        } else {
-
-            myPageDao.insert(exhibitionEntity)
+        val data = myPageDao.getEntity(exhibitionEntity.id)
+        data.let { array ->
+            if(array.isEmpty()) {
+                exhibitionEntity.isCheckedIn = true
+                myPageDao.insert(exhibitionEntity)
+            } else {
+                array[0].let {
+                    it.isCheckedIn = true
+                    myPageDao.update(it)
+                }
+            }
         }
-
-
     }
 }

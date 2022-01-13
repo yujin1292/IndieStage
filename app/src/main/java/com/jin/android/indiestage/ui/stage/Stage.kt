@@ -6,8 +6,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.material.icons.filled.BookmarkAdded
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -39,10 +37,7 @@ import com.jin.android.indiestage.data.room.ExhibitionEntity
 import com.jin.android.indiestage.ui.components.*
 import com.jin.android.indiestage.util.ViewModelFactory
 import com.jin.android.indiestage.util.lerp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
@@ -86,6 +81,7 @@ fun Stage(
     )
 }
 
+@ExperimentalCoroutinesApi
 @Composable
 fun StageScreen(
     navigateToArtWork: (
@@ -110,9 +106,6 @@ fun StageScreen(
                 exhibitionResponse.querySnapshot?.toObjects(Exhibition::class.java)?.get(0)
                     ?: Exhibition()
 
-            val exhibitionEntity =
-                viewModel.exhibitionEntity.observeAsState(ExhibitionEntity()).value
-
             Header(exhibition.image)
             Body(
                 artWorks = artWorks, artist = artist, scroll = scroll,
@@ -125,14 +118,7 @@ fun StageScreen(
             Back(onBackPress)
 
 
-            FavoriteButton(
-                isChecked = exhibitionEntity.isBookMarked,
-                onClick = {
-                    viewModel.clickBookMark()
-                },
-
-                modifier = Modifier.align(TopEnd)
-            )
+            BookMark(viewModel = viewModel, modifier = Modifier.align(TopEnd))
 
         } else {
             if (artistResponse is ArtistOnError) artistResponse.exception?.printStackTrace()
@@ -142,6 +128,27 @@ fun StageScreen(
         }
 
     }
+}
+
+@ExperimentalCoroutinesApi
+@Composable
+fun BookMark(viewModel: StageViewModel, modifier: Modifier) {
+
+    val entity =
+        viewModel.exhibitionEntity.observeAsState(ExhibitionEntity()).value
+
+    var check by remember { mutableStateOf(entity.isBookMarked) }
+    check = entity.isBookMarked
+
+    FavoriteButton(
+        isChecked = check,
+        onClick = {
+            check = check.not()
+            viewModel.clickBookMark()
+        },
+        modifier = modifier
+    )
+
 }
 
 @Composable
@@ -181,31 +188,6 @@ private fun Back(backPress: () -> Unit) {
     }
 }
 
-@Composable
-private fun BookMark(
-    bookMarkPress: () -> Unit,
-    exhibitionEntity: ExhibitionEntity,
-    modifier: Modifier
-) {
-    IconButton(
-        onClick = {
-            bookMarkPress()
-        },
-        modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .size(52.dp)
-            .background(
-                color = Color.White.copy(alpha = 0.32f),
-                shape = CircleShape
-            )
-    ) {
-        Icon(
-            imageVector = if (exhibitionEntity.isBookMarked) Icons.Default.BookmarkAdded
-            else Icons.Default.BookmarkAdd,
-            contentDescription = stringResource(R.string.back)
-        )
-    }
-}
 
 @Composable
 private fun Body(
