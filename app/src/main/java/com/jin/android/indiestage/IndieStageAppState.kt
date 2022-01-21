@@ -21,6 +21,10 @@ sealed class Screen(val route: String) {
         fun createRoute(exhibitionId: String) = "ticketBox/$exhibitionId"
     }
 
+    object Exhibitions:Screen("exhibitions/{mode}"){
+        fun createRoute(mode:String) = "exhibitions/$mode"
+    }
+
     object Stage : Screen("stage/{exhibitionId}/{mode}") {
         fun createRoute(exhibitionId: String, mode: String) = "stage/$exhibitionId/$mode"
     }
@@ -53,6 +57,13 @@ class IndieStageAppState(
 
     fun refreshOnline() {
         isOnline = checkIfOnline()
+    }
+
+    fun navigateToExhibitions(mode:String, from: NavBackStackEntry){
+        if (from.lifecycleIsResumed()) {
+            val encodedMode = Uri.encode(mode)
+            navController.navigate(Screen.Exhibitions.createRoute(encodedMode))
+        }
     }
 
     fun navigateToStage(exhibitionId: String, mode: String, from: NavBackStackEntry) {

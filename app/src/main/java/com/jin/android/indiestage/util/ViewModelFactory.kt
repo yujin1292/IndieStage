@@ -6,6 +6,7 @@ import com.jin.android.indiestage.data.firestore.ExhibitionRepository
 import com.jin.android.indiestage.data.room.BookMarkDataSource
 import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.ui.artwork.ArtWorkViewModel
+import com.jin.android.indiestage.ui.exhibitions.ExhibitionsViewModel
 import com.jin.android.indiestage.ui.home.HomeViewModel
 import com.jin.android.indiestage.ui.quickenter.QuickEnterViewModel
 import com.jin.android.indiestage.ui.stage.StageViewModel
@@ -36,6 +37,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(QuickEnterViewModel::class.java) -> {
                 QuickEnterViewModel(checkedInDataSource, exhibitionRepository) as T
+            }
+            modelClass.isAssignableFrom(ExhibitionsViewModel::class.java) -> {
+                ExhibitionsViewModel(exhibitionRepository) as T
             }
             else -> throw IllegalStateException()
         }
