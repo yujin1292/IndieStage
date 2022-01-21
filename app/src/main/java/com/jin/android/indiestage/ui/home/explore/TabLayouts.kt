@@ -33,7 +33,7 @@ fun TabItemScreen(tabItem: TabItem) {
             text = tabItem.title, style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(start = 12.dp)
         )
-        MoreExhibitions { tabItem.getMoreInfoClicked }
+        MoreExhibitions ( tabItem.title, tabItem.getMoreInfoClicked )
         LazyRow(state = listState) {
             val isClosed = tabItem.title == "Closed Exhibitions"
             items(
@@ -106,7 +106,8 @@ fun PosterItem(
 
 @Composable
 fun MoreExhibitions(
-    onClick: () -> Unit
+    title:String,
+    onClick: (String) -> Unit
 ) {
     Row {
         Spacer(
@@ -117,7 +118,7 @@ fun MoreExhibitions(
         Row(
             Modifier
                 .padding(end = 12.dp)
-                .clickable { onClick() }) {
+                .clickable { onClick(title) }) {
             Text(text = "더 보러가기", style = MaterialTheme.typography.caption)
             Icon(imageVector = Icons.Outlined.ArrowRight, contentDescription = "more Info")
         }

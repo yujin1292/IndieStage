@@ -27,7 +27,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.data.firestore.*
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 import com.jin.android.indiestage.util.ViewModelFactory

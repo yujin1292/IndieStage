@@ -1,7 +1,8 @@
 package com.jin.android.indiestage
 
-import android.app.Application
+import android.net.Uri
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -12,12 +13,14 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreen
 import com.jin.android.indiestage.ui.artwork.ArtWorkScreenAsGuest
+import com.jin.android.indiestage.ui.exhibitions.ExhibitionsScreen
 import com.jin.android.indiestage.ui.home.Home
 import com.jin.android.indiestage.ui.quickenter.QuickEnterScreen
 import com.jin.android.indiestage.ui.stage.Stage
 import com.jin.android.indiestage.ui.ticketbox.TicketBox
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalMaterialApi
 @ExperimentalCoroutinesApi
 @ExperimentalPermissionsApi
 @ExperimentalPagerApi
@@ -39,8 +42,15 @@ fun IndieStageApp(
                     navigateToTicketBox = { exhibitionId ->
                         appState.navigateToTicketBox(exhibitionId, backStackEntry)
                     },
-                    navigateToQuickEnter = {appState.navigateToQuickEnter(backStackEntry)}
+                    navigateToQuickEnter = {appState.navigateToQuickEnter(backStackEntry)},
+                    navigateToExhibitions = { mode-> appState.navigateToExhibitions(mode, backStackEntry)}
                 )
+            }
+            composable((Screen.Exhibitions.route)){
+                it.arguments?.getString("mode")?.let{ mode->
+                    ExhibitionsScreen(Uri.decode(mode))
+                }
+
             }
             composable(Screen.QuickEnter.route){ navBackStackEntry->
                 QuickEnterScreen(

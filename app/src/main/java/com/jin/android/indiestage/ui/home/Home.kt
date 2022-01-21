@@ -35,7 +35,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun Home(
     navigateToTicketBox: (String) -> Unit,
-    navigateToQuickEnter: ()->Unit,
+    navigateToQuickEnter: () -> Unit,
+    navigateToExhibitions: (String) -> Unit,
     checkedInDataSource: CheckedInDataSource,
     bookMarkDataSource: BookMarkDataSource,
     viewModel: HomeViewModel = viewModel(
@@ -56,7 +57,7 @@ fun Home(
                     title = "Opened Exhibitions",
                     itemList = it,
                     onItemClicked = navigateToTicketBox,
-                    getMoreInfoClicked = {}
+                    getMoreInfoClicked = { navigateToExhibitions("opened") }
 
                 ))
             }
@@ -72,8 +73,7 @@ fun Home(
                     title = "Closed Exhibitions",
                     itemList = it,
                     onItemClicked = navigateToTicketBox,
-                    getMoreInfoClicked = {}
-
+                    getMoreInfoClicked = { navigateToExhibitions("ready")  }
                 ))
             }
         }
@@ -88,7 +88,7 @@ fun Home(
             tabItemList = tabItemList,
             selectedHomeCategory = homeViewState.selectedHomeCategory,
             onCategorySelected = viewModel::onHomeCategorySelected,
-            navigateToQuickEnter = navigateToQuickEnter
+            navigateToQuickEnter = navigateToQuickEnter,
         )
     }
 }
@@ -101,7 +101,7 @@ fun HomeContent(
     tabItemList: List<TabItem>,
     selectedHomeCategory: HomeCategory,
     onCategorySelected: (HomeCategory) -> Unit,
-    navigateToQuickEnter: ()->Unit,
+    navigateToQuickEnter: () -> Unit,
 ) {
     val fabShape = RoundedCornerShape(50)
     Scaffold(
@@ -125,7 +125,12 @@ fun HomeContent(
                 }
             }
         },
-        floatingActionButton = { HomeFabButton(fabShape = fabShape, onClick = navigateToQuickEnter) },
+        floatingActionButton = {
+            HomeFabButton(
+                fabShape = fabShape,
+                onClick = navigateToQuickEnter
+            )
+        },
         isFloatingActionButtonDocked = true,
         floatingActionButtonPosition = FabPosition.Center,
         bottomBar = {
@@ -211,7 +216,7 @@ fun HomeBottomAppBar(
 @Composable
 fun HomeFabButton(
     fabShape: Shape,
-    onClick: ()->Unit
+    onClick: () -> Unit
 ) {
     FloatingActionButton(
         onClick = { onClick() },
