@@ -257,6 +257,7 @@ private fun Body(
 @Composable
 private fun ExhibitionDescription(exhibition: Exhibition) {
     var expended by remember { mutableStateOf(false) }
+    var visible by remember { mutableStateOf(false) }
     // 해쉬태그  Chip 형태 표기
     MidSpacer()
     HashTags()
@@ -266,27 +267,35 @@ private fun ExhibitionDescription(exhibition: Exhibition) {
         text = exhibition.description.replace("\\n", "\n"),
         maxLines = if (!expended) 4 else Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
-        modifier = HzPadding
+        modifier = HzPadding,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.hasVisualOverflow) {
+                visible = true
+            }
+        },
     )
     val textButton = if (!expended) "see More" else "see Less"
-    Text(
-        text = textButton,
-        style = MaterialTheme.typography.button,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .heightIn(20.dp)
-            .fillMaxWidth()
-            .padding(top = 15.dp)
-            .clickable {
-                expended = !expended
-            }
-    )
+    if (visible) {
+        Text(
+            text = textButton,
+            style = MaterialTheme.typography.button,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .heightIn(20.dp)
+                .fillMaxWidth()
+                .padding(top = 15.dp)
+                .clickable {
+                    expended = !expended
+                },
+
+            )
+    }
+
     MidSpacer()
 }
 
 @Composable
 private fun ArtistInfoScreen(artist: Artist) {
-
 
     IndieStageDivider()
     MidSpacer()
@@ -327,6 +336,8 @@ private fun ArtistInfoScreen(artist: Artist) {
     MidSpacer()
 
     var seeMore by remember { mutableStateOf(true) }
+    var visible by remember { mutableStateOf(false) }
+
     Text(
         text = stringResource(id = R.string.history),
         textDecoration = TextDecoration.Underline,
@@ -337,24 +348,31 @@ private fun ArtistInfoScreen(artist: Artist) {
         style = MaterialTheme.typography.body1,
         maxLines = if (seeMore) 4 else Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
-        modifier = HzPadding
-    )
+        modifier = HzPadding,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.hasVisualOverflow) {
+                visible = true
+            }
+        },
+
+        )
 
     val textButton = if (seeMore) "see More" else "see Less"
 
-    Text(
-        text = textButton,
-        style = MaterialTheme.typography.button,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .heightIn(20.dp)
-            .fillMaxWidth()
-            .padding(top = 15.dp)
-            .clickable {
-                seeMore = !seeMore
-            }
-    )
-
+    if (visible) {
+        Text(
+            text = textButton,
+            style = MaterialTheme.typography.button,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .heightIn(20.dp)
+                .fillMaxWidth()
+                .padding(top = 15.dp)
+                .clickable {
+                    seeMore = !seeMore
+                }
+        )
+    }
 }
 
 @Composable
