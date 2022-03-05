@@ -49,7 +49,7 @@ private val MinTitleOffset = 56.dp
 private val MinImageOffset = 12.dp
 private val MaxTitleOffset = ImageOverlap + MinTitleOffset + GradientScroll
 private val ExpandedImageSize = 300.dp
-private val CollapsedImageSize = 150.dp
+private val CollapsedImageSize = 80.dp
 private val HzPadding = Modifier.padding(horizontal = 24.dp)
 
 @ExperimentalCoroutinesApi

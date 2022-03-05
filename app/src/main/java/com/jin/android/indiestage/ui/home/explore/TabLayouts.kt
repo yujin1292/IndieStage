@@ -96,7 +96,8 @@ fun PosterItem(
                 )
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.caption
+                    style = MaterialTheme.typography.caption,
+                    maxLines = 2
                 )
             }
 

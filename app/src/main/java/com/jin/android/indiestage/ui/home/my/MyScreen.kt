@@ -2,6 +2,7 @@ package com.jin.android.indiestage.ui.home.my
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,7 +34,10 @@ import kotlin.math.absoluteValue
 
 @ExperimentalPagerApi
 @Composable
-fun MyScreen(viewModel: HomeViewModel) {
+fun MyScreen(
+    viewModel: HomeViewModel,
+    navigateToTicketBox: (String) -> Unit
+) {
 
     val bookmarkedList = viewModel.bookmarkedList.observeAsState(arrayListOf()).value
     val checkedInList = viewModel.checkedInList.observeAsState(arrayListOf()).value
@@ -48,7 +52,10 @@ fun MyScreen(viewModel: HomeViewModel) {
             )
         }
         item {
-            BookMarkPager(bookmarkedList)
+            BookMarkPager(
+                bookmarkedList,
+                navigateToTicketBox
+            )
         }
         item {
             Text(
@@ -63,7 +70,7 @@ fun MyScreen(viewModel: HomeViewModel) {
         } else {
             items(
                 items = checkedInList,
-                itemContent = { item -> Ticket(item) }
+                itemContent = { item -> Ticket(item, navigateToTicketBox) }
             )
         }
 
@@ -73,7 +80,10 @@ fun MyScreen(viewModel: HomeViewModel) {
 
 @ExperimentalPagerApi
 @Composable
-fun BookMarkPager(exhibitionList: List<ExhibitionEntity>) {
+fun BookMarkPager(
+    exhibitionList: List<ExhibitionEntity>,
+    navigateToTicketBox: (String) -> Unit
+) {
     val pagerState = rememberPagerState()
     Column {
         if (exhibitionList.isEmpty()) {
@@ -112,7 +122,7 @@ fun BookMarkPager(exhibitionList: List<ExhibitionEntity>) {
                         .padding(start = 64.dp, end = 64.dp)
                         .aspectRatio(0.7f)
                 )
-                { BookMarkPage(exhibitionList[page]) }
+                { BookMarkPage(exhibitionList[page], navigateToTicketBox) }
             }
             HorizontalPagerIndicator(
                 pagerState = pagerState,
@@ -125,8 +135,13 @@ fun BookMarkPager(exhibitionList: List<ExhibitionEntity>) {
 }
 
 @Composable
-fun BookMarkPage(item: ExhibitionEntity) {
-    Column() {
+fun BookMarkPage(
+    item: ExhibitionEntity,
+    navigateToTicketBox: (String) -> Unit
+) {
+    Column(
+        Modifier.clickable { navigateToTicketBox(item.id) }
+    ) {
         Image(
             painter = rememberImagePainter(data = item.image),
             contentDescription = item.title,
@@ -151,13 +166,19 @@ fun BookMarkPage(item: ExhibitionEntity) {
 }
 
 @Composable
-fun Ticket(exhibitionEntity: ExhibitionEntity) {
-    Card(modifier = Modifier.padding(10.dp)) {
+fun Ticket(
+    exhibitionEntity: ExhibitionEntity,
+    navigateToTicketBox: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .padding(10.dp)
+            .clickable { navigateToTicketBox(exhibitionEntity.id) }) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(5f)
-                .background(androidx.compose.ui.graphics.Color.Yellow)
+                .background(androidx.compose.ui.graphics.Color.Yellow),
         ) {
             Image(
                 painter = rememberImagePainter(data = exhibitionEntity.image),

@@ -1,5 +1,6 @@
 package com.jin.android.indiestage.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
@@ -73,7 +75,7 @@ fun Home(
                     title = "Closed Exhibitions",
                     itemList = it,
                     onItemClicked = navigateToTicketBox,
-                    getMoreInfoClicked = { navigateToExhibitions("ready")  }
+                    getMoreInfoClicked = { navigateToExhibitions("ready") }
                 ))
             }
         }
@@ -89,6 +91,7 @@ fun Home(
             selectedHomeCategory = homeViewState.selectedHomeCategory,
             onCategorySelected = viewModel::onHomeCategorySelected,
             navigateToQuickEnter = navigateToQuickEnter,
+            navigateToTicketBox = navigateToTicketBox
         )
     }
 }
@@ -101,6 +104,7 @@ fun HomeContent(
     tabItemList: List<TabItem>,
     selectedHomeCategory: HomeCategory,
     onCategorySelected: (HomeCategory) -> Unit,
+    navigateToTicketBox: (String) -> Unit,
     navigateToQuickEnter: () -> Unit,
 ) {
     val fabShape = RoundedCornerShape(50)
@@ -120,7 +124,7 @@ fun HomeContent(
                         ExploreScreen(tabItemList = tabItemList)
                     }
                     HomeCategory.My -> {
-                        MyScreen(viewModel)
+                        MyScreen(viewModel, navigateToTicketBox)
                     }
                 }
             }
@@ -187,7 +191,10 @@ fun HomeBottomAppBar(
     BottomAppBar(
         cutoutShape = fabShape,
         content = {
-            BottomNavigation {
+            BottomNavigation(
+                backgroundColor = colorResource(id = R.color.purple_700),
+                contentColor = Color.White
+            ) {
                 BottomNavigationItem(
                     icon = {
                         Icon(Icons.Filled.Article, "")
@@ -195,6 +202,8 @@ fun HomeBottomAppBar(
                     label = { Text(text = stringResource(id = R.string.exhibition_tab)) },
                     selected = selectedHomeCategory == HomeCategory.Exhibition,
                     onClick = { onCategorySelected(HomeCategory.Exhibition) },
+                    selectedContentColor = Color.White,
+                    unselectedContentColor = Color.White.copy(0.4f),
                     alwaysShowLabel = false
                 )
 
@@ -206,6 +215,8 @@ fun HomeBottomAppBar(
                     label = { Text(text = stringResource(id = R.string.my_tab)) },
                     selected = selectedHomeCategory == HomeCategory.My,
                     onClick = { onCategorySelected(HomeCategory.My) },
+                    selectedContentColor = Color.White,
+                    unselectedContentColor = Color.White.copy(0.4f),
                     alwaysShowLabel = false
                 )
             }
@@ -221,6 +232,7 @@ fun HomeFabButton(
     FloatingActionButton(
         onClick = { onClick() },
         shape = fabShape,
+        backgroundColor = colorResource(id = R.color.purple_200)
     ) {
         Icon(Icons.Filled.Camera, "")
     }

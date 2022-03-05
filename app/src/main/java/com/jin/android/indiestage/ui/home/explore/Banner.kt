@@ -60,7 +60,7 @@ fun BannerItem(color: Color = Color.LightGray, modifier: Modifier) {
         }
     }
     Column(
-        modifier = modifier.padding(12.dp)
+        modifier = modifier.padding(20.dp)
     ) {
         Text("Indie Stage")
         Text("내 손안의 전시회!\n인디 작가들을 응원해주세요")
