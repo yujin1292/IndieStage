@@ -13,4 +13,6 @@
     <string name="artist_info" translatable="false">Artist Information</string>
     <string name="artworks" translatable="false">Art Works</string>
     <string name="bookmark">bookmark</string>
+    <string name="open_exhibitions">Opened Exhibitions</string>
+    <string name="ready_exhibitions">Comming Soon ...</string>
 </resources>

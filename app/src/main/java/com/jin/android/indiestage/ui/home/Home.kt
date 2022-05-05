@@ -56,7 +56,7 @@ fun Home(
         is OnSuccess -> {
             opened.querySnapshot?.toObjects(Exhibition::class.java)?.let {
                 tabItemList.add(TabItem(
-                    title = "Opened Exhibitions",
+                    title = stringResource(id = R.string.open_exhibitions),
                     itemList = it,
                     onItemClicked = navigateToTicketBox,
                     getMoreInfoClicked = { navigateToExhibitions("opened") }
@@ -72,7 +72,7 @@ fun Home(
         is OnSuccess -> {
             closed.querySnapshot?.toObjects(Exhibition::class.java)?.let {
                 tabItemList.add(TabItem(
-                    title = "Closed Exhibitions",
+                    title = stringResource(id = R.string.ready_exhibitions),
                     itemList = it,
                     onItemClicked = navigateToTicketBox,
                     getMoreInfoClicked = { navigateToExhibitions("ready") }
@@ -165,10 +165,10 @@ fun HomeTopAppBar(
             }
         },
         backgroundColor = backgroundColor,
-        actions = {
+       /* actions = {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 IconButton(
-                    onClick = { /* TODO: Open Setting */ }
+                    onClick = { *//* TODO: Open Setting *//* }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Settings,
@@ -176,7 +176,7 @@ fun HomeTopAppBar(
                     )
                 }
             }
-        },
+        },*/
         modifier = modifier
     )
 }

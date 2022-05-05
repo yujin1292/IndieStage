@@ -19,21 +19,41 @@ import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-
 @ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
 fun ExhibitionsScreen(
     mode: String,
+    navigateToTicketBox: (String) -> Unit,
     viewModel: ExhibitionsViewModel = viewModel(factory = ViewModelFactory(exhibitionRepository = ExhibitionRepository()))
 ) {
 
     val state = viewModel.state.collectAsState()
 
     val tabs = listOf(
-        TabItem(Icons.Filled.Article, "Open", viewModel) { ExhibitionsContents(viewModel , state.value.openedExhibitionFlow) },
-        TabItem(Icons.Filled.Article, "Ready", viewModel) { ExhibitionsContents(viewModel, state.value.readyExhibitionFlow) }
+        TabItem(
+            icon = Icons.Filled.Article,
+            title = "Open",
+            viewModel = viewModel,
+            screen = {
+                ExhibitionsContents(
+                    viewModel,
+                    state.value.openedExhibitionFlow,
+                    onClick = navigateToTicketBox,
+                )
+            }),
+        TabItem(
+            icon = Icons.Filled.Article,
+            title = "Ready",
+            viewModel = viewModel,
+            screen = {
+                ExhibitionsContents(
+                    viewModel,
+                    state.value.readyExhibitionFlow ,
+                    onClick = {/* TODO 토스트 띄우기 ? */}
+                )
+            })
     )
 
     val pagerState = if (mode == "ready") rememberPagerState(1)

@@ -260,7 +260,7 @@ private fun ExhibitionDescription(exhibition: Exhibition) {
     var visible by remember { mutableStateOf(false) }
     // 해쉬태그  Chip 형태 표기
     MidSpacer()
-    HashTags()
+    HashTags( exhibition.hashTags )
 
     MidSpacer()
     Text(
@@ -408,15 +408,7 @@ private fun Title(exhibition: Exhibition, artist: Artist, scroll: Int) {
 
 @Composable
 private fun HashTags(
-    list: List<String> = listOf(
-        "#hashtag",
-        "#genre",
-        " #IndieStage",
-        "#hi",
-        "#hashtag",
-        "#genre",
-        " #IndieStage"
-    )
+    list: List<String>
 ) {
     ChipVerticalGrid(
         spacing = 5.dp,

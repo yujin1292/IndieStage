@@ -10,13 +10,20 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.firestore.Exhibition
+import com.jin.android.indiestage.ui.components.midGap
+import com.jin.android.indiestage.ui.theme.IndieStageTheme
 
 @Composable
 fun TabLayouts(tabItems: List<TabItem>) {
@@ -28,14 +35,16 @@ fun TabLayouts(tabItems: List<TabItem>) {
 @Composable
 fun TabItemScreen(tabItem: TabItem) {
     val listState = rememberLazyListState()
+    val isClosed = tabItem.title == stringResource(id = R.string.ready_exhibitions)
+
     Column {
         Text(
             text = tabItem.title, style = MaterialTheme.typography.h6,
-            modifier = Modifier.padding(start = 12.dp)
+            modifier = Modifier.padding(start = 12.dp, top = 5.dp)
         )
-        MoreExhibitions ( tabItem.title, tabItem.getMoreInfoClicked )
+        MoreExhibitions(tabItem.title, tabItem.getMoreInfoClicked)
         LazyRow(state = listState) {
-            val isClosed = tabItem.title == "Closed Exhibitions"
+
             items(
                 items = tabItem.itemList,
                 itemContent = { item ->
@@ -107,7 +116,7 @@ fun PosterItem(
 
 @Composable
 fun MoreExhibitions(
-    title:String,
+    title: String,
     onClick: (String) -> Unit
 ) {
     Row {
@@ -116,12 +125,18 @@ fun MoreExhibitions(
                 .fillMaxWidth()
                 .weight(1f)
         )
-        Row(
-            Modifier
-                .padding(end = 12.dp)
-                .clickable { onClick(title) }) {
-            Text(text = "더 보러가기", style = MaterialTheme.typography.caption)
-            Icon(imageVector = Icons.Outlined.ArrowRight, contentDescription = "more Info")
+        Row(Modifier.clickable { onClick(title) })
+        {
+            Text(
+                text = "더 보러가기",
+                style = MaterialTheme.typography.caption,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.height(17.dp)
+            )
+            Icon(
+                imageVector = Icons.Outlined.ArrowRight, contentDescription = "more Info",
+                Modifier.size(17.dp).align(CenterVertically)
+            )
         }
     }
 }
@@ -133,3 +148,20 @@ data class TabItem(
     val getMoreInfoClicked: (String) -> Unit,
     val onItemClicked: (String) -> Unit,
 )
+
+
+@Composable
+@Preview
+fun TabLayoutPreview() {
+    IndieStageTheme() {
+        val f: (String) -> Unit = {  }
+        TabLayouts(
+            listOf(
+                TabItem(
+                    title = "title", itemList = mutableListOf(Exhibition()),
+                    getMoreInfoClicked = f, onItemClicked = f
+                )
+            )
+        )
+    }
+}

@@ -50,7 +50,6 @@ class HomeViewModel(
                     errorMessage = null /* TODO */
                 )
             }.catch { throwable ->
-                // TODO: emit a UI error here. For now we'll just rethrow
                 throw throwable
             }.collect {
                 _state.value = it

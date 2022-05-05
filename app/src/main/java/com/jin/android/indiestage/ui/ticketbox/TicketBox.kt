@@ -41,6 +41,10 @@ import com.jin.android.indiestage.util.QrCodeAnalyzer
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+/*
+* TODO  저장된 티켓이라면 바로 입장시키기
+* */
+
 @ExperimentalCoroutinesApi
 @ExperimentalPermissionsApi
 @Composable
