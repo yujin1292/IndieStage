@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.data.firestore.EnterCodeOnSuccess
 import com.jin.android.indiestage.data.firestore.Exhibition
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.data.firestore.OnSuccess
 import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.data.room.ExhibitionEntity
@@ -20,18 +20,19 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 class TicketBoxViewModel(
     private val checkedInDataSource: CheckedInDataSource?,
-    private val exhibitionRepository: ExhibitionRepository,
+    private val fireStoreRepository: FireStoreRepository,
     private val exhibitionId: String,
 ) : ViewModel() {
     val state: MutableStateFlow<TicketBoxState> = MutableStateFlow(InitialState)
 
     private var enterCode: String = ""
     private var exhibition: Exhibition = Exhibition()
+    private var isCheckedIn :Boolean = false
 
     init {
         viewModelScope.launch {
             launch {
-                exhibitionRepository.getExhibitionEnterCode(exhibitionId).collect {
+                fireStoreRepository.getExhibitionEnterCode(exhibitionId).collect {
                     when (it) {
                         is EnterCodeOnSuccess -> {
                             enterCode = it.enterCode
@@ -42,11 +43,8 @@ class TicketBoxViewModel(
                         }
                     }
                 }
-            }
 
-
-            launch {
-                exhibitionRepository.getExhibitionsById(exhibitionId).collect {
+                fireStoreRepository.getExhibitionsById(exhibitionId).collect {
                     when (it) {
                         is OnSuccess -> {
                             exhibition =
@@ -58,8 +56,18 @@ class TicketBoxViewModel(
                         }
                     }
                 }
+
+
             }
 
+        }
+    }
+
+    fun checkIsCheckedId(){
+        viewModelScope.launch {
+            if (checkedInDataSource?.isCheckedIn(exhibitionId) == true) {
+                state.value = IsCheckedIn
+            }
         }
     }
 
@@ -83,6 +91,7 @@ class TicketBoxViewModel(
 
 sealed class TicketBoxState{
     object InitialState:TicketBoxState()
+    object IsCheckedIn : TicketBoxState()
     object StartNavigation:TicketBoxState()
     object WrongEnterCode: TicketBoxState()
     object WrongId:TicketBoxState()

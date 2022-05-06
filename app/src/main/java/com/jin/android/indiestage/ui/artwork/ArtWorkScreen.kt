@@ -41,7 +41,7 @@ fun ArtWorkScreen(
     artWorkId: String,
     viewModel: ArtWorkViewModel = viewModel(
         factory = ViewModelFactory(
-            exhibitionRepository = ExhibitionRepository(),
+            fireStoreRepository = FireStoreRepository(),
             exhibitionId = exhibitionId,
             artWorkId = artWorkId
         )

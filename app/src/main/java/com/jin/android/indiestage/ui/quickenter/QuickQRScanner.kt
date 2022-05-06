@@ -32,7 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.data.QRMessage
 import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.util.QrCodeAnalyzer
@@ -47,7 +47,7 @@ fun QuickEnterScreen(
     viewModel: QuickEnterViewModel = viewModel(
         factory = ViewModelFactory(
             checkedInDataSource = checkedInDataSource,
-            exhibitionRepository = ExhibitionRepository()
+            fireStoreRepository = FireStoreRepository()
         )
     )
 ) {

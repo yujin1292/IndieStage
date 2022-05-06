@@ -14,6 +14,6 @@
     <string name="artworks" translatable="false">Art Works</string>
     <string name="bookmark">bookmark</string>
     <string name="open_exhibitions">Opened Exhibitions</string>
-    <string name="ready_exhibitions">Comming Soon ...</string>
+    <string name="ready_exhibitions">Coming Soon …</string>
     <string name="ready_exhibition_info">It will be opened soon!</string>
 </resources>

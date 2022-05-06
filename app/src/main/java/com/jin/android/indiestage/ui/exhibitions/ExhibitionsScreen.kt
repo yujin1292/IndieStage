@@ -1,6 +1,5 @@
 package com.jin.android.indiestage.ui.exhibitions
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -12,11 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.*
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -29,7 +27,7 @@ fun ExhibitionsScreen(
     mode: String,
     navigateToTicketBox: (String) -> Unit,
     showToast: (String) -> Unit,
-    viewModel: ExhibitionsViewModel = viewModel(factory = ViewModelFactory(exhibitionRepository = ExhibitionRepository()))
+    viewModel: ExhibitionsViewModel = viewModel(factory = ViewModelFactory(fireStoreRepository = FireStoreRepository()))
 ) {
 
     val state = viewModel.state.collectAsState()

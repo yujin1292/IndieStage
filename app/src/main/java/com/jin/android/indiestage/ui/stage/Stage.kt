@@ -61,7 +61,7 @@ fun Stage(
     exhibitionId: String,
     viewModel: StageViewModel = viewModel(
         factory = ViewModelFactory(
-            exhibitionRepository = ExhibitionRepository(),
+            fireStoreRepository = FireStoreRepository(),
             bookMarkDataSource = bookMarkDataSource,
             exhibitionId = exhibitionId
         )
