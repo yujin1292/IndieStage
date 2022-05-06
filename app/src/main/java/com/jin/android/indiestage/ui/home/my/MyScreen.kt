@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.*
@@ -177,8 +178,7 @@ fun Ticket(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(5f)
-                .background(androidx.compose.ui.graphics.Color.Yellow),
+                .aspectRatio(5f),
         ) {
             Image(
                 painter = rememberImagePainter(data = exhibitionEntity.image),
@@ -203,7 +203,6 @@ fun EmptyBox() {
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(2f)
-                .background(Color.Gray)
         ) {
             Column(
                 modifier = Modifier.align(Center),
@@ -212,7 +211,10 @@ fun EmptyBox() {
                 Icon(
                     imageVector = Icons.Filled.SentimentDissatisfied, contentDescription = null,
                 )
-                Text(text = "Empty! Please Add Something")
+                Text(
+                    text = "다른 전시들을 추가해보세요",
+                    style = MaterialTheme.typography.caption
+                )
             }
 
         }
