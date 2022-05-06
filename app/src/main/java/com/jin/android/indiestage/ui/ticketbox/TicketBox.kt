@@ -30,12 +30,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.permissions.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
 import com.jin.android.indiestage.data.QRMessage
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.util.QrCodeAnalyzer
 import com.jin.android.indiestage.util.ViewModelFactory
@@ -52,7 +52,7 @@ fun TicketBox(
     viewModel: TicketBoxViewModel = viewModel(
         factory = ViewModelFactory(
             checkedInDataSource = checkedInDataSource,
-            exhibitionRepository = ExhibitionRepository(),
+            fireStoreRepository = FireStoreRepository(),
             exhibitionId = exhibitionId
         )
     )
@@ -79,9 +79,9 @@ fun TicketBox(
             }
         }
     )
+    viewModel.checkIsCheckedId()
 
     LaunchedEffect(key1 = true) { launcher.launch(Manifest.permission.CAMERA) }
-
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -247,6 +247,14 @@ fun QRCodeScanner(
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+            }
+            TicketBoxState.IsCheckedIn ->{
+                navigateToStage(exhibitionId, "auth")
+                Toast.makeText(
+                    context,
+                    "반갑습니다",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

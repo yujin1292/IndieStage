@@ -14,26 +14,47 @@ import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.*
 import com.jin.android.indiestage.R
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-
+@Composable
 @ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
-@Composable
 fun ExhibitionsScreen(
     mode: String,
-    viewModel: ExhibitionsViewModel = viewModel(factory = ViewModelFactory(exhibitionRepository = ExhibitionRepository()))
+    navigateToTicketBox: (String) -> Unit,
+    showToast: (String) -> Unit,
+    viewModel: ExhibitionsViewModel = viewModel(factory = ViewModelFactory(fireStoreRepository = FireStoreRepository()))
 ) {
 
     val state = viewModel.state.collectAsState()
 
     val tabs = listOf(
-        TabItem(Icons.Filled.Article, "Open", viewModel) { ExhibitionsContents(viewModel , state.value.openedExhibitionFlow) },
-        TabItem(Icons.Filled.Article, "Ready", viewModel) { ExhibitionsContents(viewModel, state.value.readyExhibitionFlow) }
+        TabItem(
+            icon = Icons.Filled.Article,
+            title = "Open",
+            viewModel = viewModel,
+            screen = {
+                ExhibitionsContents(
+                    viewModel,
+                    state.value.openedExhibitionFlow,
+                    onClick = navigateToTicketBox,
+                )
+            }),
+        TabItem(
+            icon = Icons.Filled.Article,
+            title = "Ready",
+            viewModel = viewModel,
+            screen = {
+                ExhibitionsContents(
+                    viewModel,
+                    state.value.readyExhibitionFlow,
+                    onClick = showToast
+                )
+            })
     )
 
     val pagerState = if (mode == "ready") rememberPagerState(1)

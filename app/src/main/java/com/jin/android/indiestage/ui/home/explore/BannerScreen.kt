@@ -1,5 +1,6 @@
 package com.jin.android.indiestage.ui.home.explore
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
@@ -8,19 +9,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import com.jin.android.indiestage.data.firestore.Banner
 import com.jin.android.indiestage.ui.theme.IndieStageTheme
 
 @ExperimentalPagerApi
 @Composable
-fun HomeBanner(
-    bannerList: List<Color> = listOf(Color.Gray, Color.LightGray)
-) {
+fun HomeBanner(bannerList: List<Banner>) {
     val pagerState = rememberPagerState()
 
     Box(Modifier.padding(8.dp)) {
@@ -29,8 +31,7 @@ fun HomeBanner(
             state = pagerState,
         ) { page ->
             BannerItem(
-                bannerList[page], Modifier
-                    .align(Alignment.BottomStart)
+                bannerList[page], Modifier.align(Alignment.BottomStart)
             )
         }
 
@@ -45,7 +46,7 @@ fun HomeBanner(
 }
 
 @Composable
-fun BannerItem(color: Color = Color.LightGray, modifier: Modifier) {
+fun BannerItem(banner: Banner, modifier: Modifier) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,25 +54,20 @@ fun BannerItem(color: Color = Color.LightGray, modifier: Modifier) {
             .padding(4.dp)
     ) {
         Row(
-            modifier = Modifier
-                .background(color)
-                .fillMaxSize()
-        ) { //TODO Set Banner image
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Image(
+                painter = rememberImagePainter(data = banner.image),
+                contentDescription = banner.text,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
     Column(
         modifier = modifier.padding(20.dp)
     ) {
-        Text("Indie Stage")
-        Text("내 손안의 전시회!\n인디 작가들을 응원해주세요")
+        Text(banner.text)
         Spacer(modifier = Modifier.height(20.dp))
-    }
-}
-
-@Composable
-@Preview
-fun BannerItemPreview() {
-    IndieStageTheme() {
-        BannerItem(modifier = Modifier)
     }
 }

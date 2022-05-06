@@ -10,17 +10,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.jin.android.indiestage.data.firestore.Banner
 
 @ExperimentalPagerApi
 @Composable
-fun ExploreScreen(tabItemList: List<TabItem>) {
+fun ExploreScreen(tabItemList: List<TabItem> , bannerList : List<Banner>) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState),
     ) {
-        HomeBanner()
+        HomeBanner(bannerList)
         TabLayouts(tabItems = tabItemList)
         Spacer(modifier = Modifier.height(64.dp))
     }

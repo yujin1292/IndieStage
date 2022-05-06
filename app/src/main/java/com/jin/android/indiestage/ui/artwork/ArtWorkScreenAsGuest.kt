@@ -22,7 +22,7 @@ import com.jin.android.indiestage.R
 import com.jin.android.indiestage.data.firestore.ArtWork
 import com.jin.android.indiestage.data.firestore.ArtWorkOnError
 import com.jin.android.indiestage.data.firestore.ArtWorkOnSuccess
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -35,7 +35,7 @@ fun ArtWorkScreenAsGuest(
     artWorkId: String,
     viewModel: ArtWorkViewModel = viewModel(
         factory = ViewModelFactory(
-            exhibitionRepository = ExhibitionRepository(),
+            fireStoreRepository = FireStoreRepository(),
             exhibitionId = exhibitionId,
             artWorkId = artWorkId
         )

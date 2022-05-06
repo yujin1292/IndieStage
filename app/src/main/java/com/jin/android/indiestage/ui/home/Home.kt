@@ -1,6 +1,5 @@
 package com.jin.android.indiestage.ui.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -8,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.FactCheck
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,10 +18,9 @@ import androidx.compose.ui.res.painterResource
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.jin.android.indiestage.R
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jin.android.indiestage.data.firestore.Exhibition
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
-import com.jin.android.indiestage.data.firestore.OnError
-import com.jin.android.indiestage.data.firestore.OnSuccess
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
+import com.jin.android.indiestage.data.firestore.*
 import com.jin.android.indiestage.data.room.BookMarkDataSource
 import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.ui.home.my.MyScreen
@@ -45,24 +42,33 @@ fun Home(
         factory = ViewModelFactory(
             checkedInDataSource,
             bookMarkDataSource,
-            ExhibitionRepository()
+            FireStoreRepository()
         )
     )
 ) {
     val homeViewState by viewModel.state.collectAsState()
 
     val tabItemList = mutableListOf<TabItem>()
+    var bannerList:List<Banner> = listOf()
+
     when (val opened = homeViewState.openedExhibitionFlow) {
         is OnSuccess -> {
-            opened.querySnapshot?.toObjects(Exhibition::class.java)?.let {
-                tabItemList.add(TabItem(
-                    title = "Opened Exhibitions",
-                    itemList = it,
-                    onItemClicked = navigateToTicketBox,
-                    getMoreInfoClicked = { navigateToExhibitions("opened") }
+            val list = mutableListOf<Exhibition>()
 
-                ))
+            opened.querySnapshot?.let { snapShot ->
+                for (query in snapShot) {
+                    val item = query.toObject<Exhibition>()
+                    item.isOpened = query["isOpened"] == true
+                    list.add(item)
+                }
             }
+            tabItemList.add(TabItem(
+                title = stringResource(id = R.string.open_exhibitions),
+                itemList = list,
+                onItemClicked = navigateToTicketBox,
+                getMoreInfoClicked = { navigateToExhibitions("opened") }
+            ))
+
         }
         is OnError -> {
             opened.exception?.printStackTrace()
@@ -70,17 +76,35 @@ fun Home(
     }
     when (val closed = homeViewState.closedExhibitionFlow) {
         is OnSuccess -> {
-            closed.querySnapshot?.toObjects(Exhibition::class.java)?.let {
-                tabItemList.add(TabItem(
-                    title = "Closed Exhibitions",
-                    itemList = it,
-                    onItemClicked = navigateToTicketBox,
-                    getMoreInfoClicked = { navigateToExhibitions("ready") }
-                ))
+            val list = mutableListOf<Exhibition>()
+
+            closed.querySnapshot?.let { snapShot ->
+                for (query in snapShot) {
+                    val item = query.toObject<Exhibition>()
+                    item.isOpened = query["isOpened"] == true
+                    list.add(item)
+                }
             }
+
+            tabItemList.add(TabItem(
+                title = stringResource(id = R.string.ready_exhibitions),
+                itemList = list,
+                onItemClicked = navigateToTicketBox,
+                getMoreInfoClicked = { navigateToExhibitions("ready") }
+            ))
         }
         is OnError -> {
             closed.exception?.printStackTrace()
+        }
+    }
+    when (val banners = homeViewState.bannerFlow){
+        is BannerOnSuccess ->{
+            banners.data?.let{
+                bannerList = it.toObjects()
+            }
+        }
+        is BannerOnError ->{
+            banners.exception?.printStackTrace()
         }
     }
 
@@ -88,6 +112,7 @@ fun Home(
         HomeContent(
             viewModel = viewModel,
             tabItemList = tabItemList,
+            bannerList = bannerList,
             selectedHomeCategory = homeViewState.selectedHomeCategory,
             onCategorySelected = viewModel::onHomeCategorySelected,
             navigateToQuickEnter = navigateToQuickEnter,
@@ -102,6 +127,7 @@ fun Home(
 fun HomeContent(
     viewModel: HomeViewModel,
     tabItemList: List<TabItem>,
+    bannerList :List<Banner>,
     selectedHomeCategory: HomeCategory,
     onCategorySelected: (HomeCategory) -> Unit,
     navigateToTicketBox: (String) -> Unit,
@@ -121,7 +147,7 @@ fun HomeContent(
             ) {
                 when (selectedHomeCategory) {
                     HomeCategory.Exhibition -> {
-                        ExploreScreen(tabItemList = tabItemList)
+                        ExploreScreen(tabItemList, bannerList)
                     }
                     HomeCategory.My -> {
                         MyScreen(viewModel, navigateToTicketBox)
@@ -165,10 +191,10 @@ fun HomeTopAppBar(
             }
         },
         backgroundColor = backgroundColor,
-        actions = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                IconButton(
-                    onClick = { /* TODO: Open Setting */ }
+        /* actions = {
+             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                 IconButton(
+                     onClick = {  }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Settings,
@@ -176,7 +202,7 @@ fun HomeTopAppBar(
                     )
                 }
             }
-        },
+        },*/
         modifier = modifier
     )
 }

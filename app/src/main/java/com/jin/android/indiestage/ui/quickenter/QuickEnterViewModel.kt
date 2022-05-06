@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jin.android.indiestage.data.*
 import com.jin.android.indiestage.data.firestore.Exhibition
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.data.firestore.OnSuccess
 import com.jin.android.indiestage.data.room.CheckedInDataSource
 import com.jin.android.indiestage.data.room.ExhibitionEntity
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 class QuickEnterViewModel(
     private val checkedInDataSource: CheckedInDataSource?,
-    private val exhibitionRepository: ExhibitionRepository
+    private val fireStoreRepository: FireStoreRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<QuickEnterState>(InitialState)
@@ -38,7 +38,7 @@ class QuickEnterViewModel(
         viewModelScope.launch {
 
 
-            exhibitionRepository.getExhibitionsById(msg.id).collect { response ->
+            fireStoreRepository.getExhibitionsById(msg.id).collect { response ->
                 when (response) {
                     is OnSuccess -> {
                         val exhibition =

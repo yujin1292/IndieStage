@@ -2,14 +2,15 @@ package com.jin.android.indiestage.ui.exhibitions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jin.android.indiestage.data.firestore.ExhibitionRepository
+import com.jin.android.indiestage.data.firestore.FireStoreRepository
 import com.jin.android.indiestage.data.firestore.ExhibitionResponse
 import com.jin.android.indiestage.data.firestore.OnError
-import com.jin.android.indiestage.ui.home.HomeViewState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class ExhibitionsViewModel(exhibitionRepository: ExhibitionRepository) : ViewModel() {
+@ExperimentalCoroutinesApi
+class ExhibitionsViewModel(fireStoreRepository: FireStoreRepository) : ViewModel() {
 
     lateinit var openedExhibitionFlow : Flow<ExhibitionResponse>
     lateinit var readyExhibitionFlow :  Flow<ExhibitionResponse>
@@ -20,7 +21,7 @@ class ExhibitionsViewModel(exhibitionRepository: ExhibitionRepository) : ViewMod
 
     init {
         viewModelScope.launch {
-            exhibitionRepository.run {
+            fireStoreRepository.run {
                 openedExhibitionFlow = getOpenedExhibitions()
                 readyExhibitionFlow = getClosedExhibitions()
             }

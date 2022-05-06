@@ -1,6 +1,5 @@
 package com.jin.android.indiestage.ui.stage
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 class StageViewModel(
     private val bookMarkDataSource: BookMarkDataSource?,
-    private val exhibitionRepository: ExhibitionRepository,
+    private val fireStoreRepository: FireStoreRepository,
     private val exhibitionId: String
 ) : ViewModel() {
 
@@ -31,9 +30,9 @@ class StageViewModel(
     init {
         viewModelScope.launch {
             exhibitionId.run {
-                exhibitionFlow = exhibitionRepository.getExhibitionsById(this)
-                artistInfoFlow = exhibitionRepository.getArtist(this)
-                artWorkInfoFlow = exhibitionRepository.getArtWorks(this)
+                exhibitionFlow = fireStoreRepository.getExhibitionsById(this)
+                artistInfoFlow = fireStoreRepository.getArtist(this)
+                artWorkInfoFlow = fireStoreRepository.getArtWorks(this)
             }
             combine(
                 exhibitionFlow,

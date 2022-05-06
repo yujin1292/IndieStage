@@ -1,14 +1,33 @@
 package com.jin.android.indiestage.data.firestore
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 
 @ExperimentalCoroutinesApi
-class ExhibitionRepository {
+class FireStoreRepository {
     private val fireStore = FirebaseFirestore.getInstance()
+
+    fun getAllBanners() = callbackFlow {
+        val collection = fireStore.collection("banner")
+        val snapshotListener = collection.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                BannerOnSuccess(value)
+            } else {
+                BannerOnError(error)
+            }
+
+            this.trySend(response).isSuccess
+        }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
 
     fun getAllExhibitions() = callbackFlow {
         val collection = fireStore.collection("exhibition")
