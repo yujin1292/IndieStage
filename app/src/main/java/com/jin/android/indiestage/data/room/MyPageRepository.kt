@@ -47,6 +47,6 @@ class MyPageRepository(private val myPageDao: MyPageDao) : CheckedInDataSource, 
     }
 
     override suspend fun isCheckedIn(exhibitionId: String) :Boolean {
-        return myPageDao.getCount(exhibitionId) > 0
+        return myPageDao.getCheckedInCountWithId(exhibitionId) >= 1
     }
 }

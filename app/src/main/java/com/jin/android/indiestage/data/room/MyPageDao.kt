@@ -17,6 +17,9 @@ interface MyPageDao {
     @Query("SELECT * FROM exhibition WHERE id =:id")
     suspend fun getEntity(id:String):Array<ExhibitionEntity>
 
+    @Query("SELECT COUNT(*) FROM exhibition WHERE id = :id and isCheckedIn = 1")
+    suspend fun getCheckedInCountWithId(id:String):Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: ExhibitionEntity)
 

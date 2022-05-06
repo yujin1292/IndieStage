@@ -15,6 +15,7 @@ import com.jin.android.indiestage.util.EnterCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -27,43 +28,39 @@ class TicketBoxViewModel(
 
     private var enterCode: String = ""
     private var exhibition: Exhibition = Exhibition()
-    private var isCheckedIn :Boolean = false
 
     init {
         viewModelScope.launch {
-            launch {
-                fireStoreRepository.getExhibitionEnterCode(exhibitionId).collect {
-                    when (it) {
-                        is EnterCodeOnSuccess -> {
-                            enterCode = it.enterCode
-                            Log.d("tag", enterCode)
-                        }
-                        else -> {
-                            Log.d("tag", "failed")
-                        }
-                    }
+
+            val enterCodeFlow = fireStoreRepository.getExhibitionEnterCode(exhibitionId)
+            val exhibitionFlow = fireStoreRepository.getExhibitionsById(exhibitionId)
+
+            combine(
+                enterCodeFlow,
+                exhibitionFlow
+            ) { enter, exhi ->
+
+                val codeResult = when (enter) {
+                    is EnterCodeOnSuccess -> enter.enterCode
+                    else -> ""
                 }
 
-                fireStoreRepository.getExhibitionsById(exhibitionId).collect {
-                    when (it) {
-                        is OnSuccess -> {
-                            exhibition =
-                                it.querySnapshot?.toObjects(Exhibition::class.java)?.get(0)!!
-                            Log.d("tag", enterCode)
-                        }
-                        else -> {
-                            Log.d("tag", "failed")
-                        }
-                    }
+                val exhibitionResult: Exhibition = when (exhi) {
+                    is OnSuccess -> exhi.querySnapshot?.toObjects(Exhibition::class.java)?.get(0)!!
+                    else -> Exhibition()
                 }
 
-
+                TicketResponse(codeResult, exhibitionResult)
+            }.collect {
+                exhibition = it.exhibition
+                enterCode = it.enterCode
             }
+
 
         }
     }
 
-    fun checkIsCheckedId(){
+    fun checkIsCheckedId() {
         viewModelScope.launch {
             if (checkedInDataSource?.isCheckedIn(exhibitionId) == true) {
                 state.value = IsCheckedIn
@@ -71,8 +68,8 @@ class TicketBoxViewModel(
         }
     }
 
-    fun verifyEnterCode(msg:QRMessage) {
-        if(msg.id != exhibitionId){
+    fun verifyEnterCode(msg: QRMessage) {
+        if (msg.id != exhibitionId) {
             state.value = WrongId
             return
         }
@@ -81,7 +78,7 @@ class TicketBoxViewModel(
             if (isMatched) {
                 checkedInDataSource?.checkIn(ExhibitionEntity(exhibition))
                 state.value = StartNavigation
-            }else{
+            } else {
                 state.value = WrongEnterCode
             }
         }
@@ -89,10 +86,16 @@ class TicketBoxViewModel(
 
 }
 
-sealed class TicketBoxState{
-    object InitialState:TicketBoxState()
+
+sealed class TicketBoxState {
+    object InitialState : TicketBoxState()
     object IsCheckedIn : TicketBoxState()
-    object StartNavigation:TicketBoxState()
-    object WrongEnterCode: TicketBoxState()
-    object WrongId:TicketBoxState()
+    object StartNavigation : TicketBoxState()
+    object WrongEnterCode : TicketBoxState()
+    object WrongId : TicketBoxState()
 }
+
+data class TicketResponse(
+    var enterCode: String = "",
+    var exhibition: Exhibition = Exhibition()
+)
