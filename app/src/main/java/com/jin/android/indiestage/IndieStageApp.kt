@@ -1,6 +1,7 @@
 package com.jin.android.indiestage
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,6 +33,10 @@ fun IndieStageApp(
     appState: IndieStageAppState = rememberIndieStageAppState()
 
 ) {
+    val showToast: (String) -> Unit = {
+        Toast.makeText(application, it, Toast.LENGTH_SHORT).show()
+    }
+
     if (appState.isOnline) {
         NavHost(
             navController = appState.navController,
@@ -57,6 +62,7 @@ fun IndieStageApp(
                 it.arguments?.getString("mode")?.let { mode ->
                     ExhibitionsScreen(
                         mode = Uri.decode(mode),
+                        showToast = showToast,
                         navigateToTicketBox = { exhibitionId ->
                             appState.navigateToTicketBox(exhibitionId, it)
                         },

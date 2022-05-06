@@ -15,4 +15,5 @@
     <string name="bookmark">bookmark</string>
     <string name="open_exhibitions">Opened Exhibitions</string>
     <string name="ready_exhibitions">Comming Soon ...</string>
+    <string name="ready_exhibition_info">It will be opened soon!</string>
 </resources>

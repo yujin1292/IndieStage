@@ -1,5 +1,6 @@
 package com.jin.android.indiestage.ui.exhibitions
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.*
 import com.jin.android.indiestage.R
@@ -19,13 +21,14 @@ import com.jin.android.indiestage.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
+@Composable
 @ExperimentalCoroutinesApi
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
-@Composable
 fun ExhibitionsScreen(
     mode: String,
     navigateToTicketBox: (String) -> Unit,
+    showToast: (String) -> Unit,
     viewModel: ExhibitionsViewModel = viewModel(factory = ViewModelFactory(exhibitionRepository = ExhibitionRepository()))
 ) {
 
@@ -50,8 +53,8 @@ fun ExhibitionsScreen(
             screen = {
                 ExhibitionsContents(
                     viewModel,
-                    state.value.readyExhibitionFlow ,
-                    onClick = {/* TODO 토스트 띄우기 ? */}
+                    state.value.readyExhibitionFlow,
+                    onClick = showToast
                 )
             })
     )

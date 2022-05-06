@@ -5,7 +5,7 @@ import com.google.firebase.firestore.QuerySnapshot
 
 data class Exhibition(
     val id: String,
-    val isOpened: Boolean,
+    var isOpened: Boolean,
     val title: String,
     val image: String,
     val description: String,
@@ -15,7 +15,7 @@ data class Exhibition(
     val hashTags: List<String>
 ) {
     constructor() : this(
-        "", true, "", "", "", Artist(), ArtWork(), "",
+        "", false, "", "", "", Artist(), ArtWork(), "",
         listOf(
             "#hashtag",
             "#genre",

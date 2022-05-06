@@ -47,7 +47,7 @@ class HomeViewModel(
                     selectedHomeCategory = selectedCategory,
                     openedExhibitionFlow = openedExhibitionFlow,
                     closedExhibitionFlow = closedExhibitionFlow,
-                    errorMessage = null /* TODO */
+                    errorMessage = "Error"
                 )
             }.catch { throwable ->
                 throw throwable

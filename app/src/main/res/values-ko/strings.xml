@@ -10,4 +10,5 @@
     <string name="bookmark">bookmark</string>
     <string name="open_exhibitions">진행중인 전시</string>
     <string name="ready_exhibitions">곧 열릴 전시</string>
+    <string name="ready_exhibition_info">전시가 준비중 입니다!</string>
 </resources>

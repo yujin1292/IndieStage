@@ -6,9 +6,11 @@ import com.jin.android.indiestage.data.firestore.ExhibitionRepository
 import com.jin.android.indiestage.data.firestore.ExhibitionResponse
 import com.jin.android.indiestage.data.firestore.OnError
 import com.jin.android.indiestage.ui.home.HomeViewState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class ExhibitionsViewModel(exhibitionRepository: ExhibitionRepository) : ViewModel() {
 
     lateinit var openedExhibitionFlow : Flow<ExhibitionResponse>
